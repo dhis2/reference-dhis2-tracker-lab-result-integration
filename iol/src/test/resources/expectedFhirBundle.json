@@ -1,0 +1,120 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:ff991a8e-db1c-dfe2-e5b1-e411451eb602",
+      "resource": {
+        "resourceType": "Patient",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/ips/StructureDefinition/Patient-uv-ips"
+          ]
+        },
+        "identifier": [
+          {
+            "system": "urn:dhis2:anc:uniqueId",
+            "value": "8879798"
+          }
+        ],
+        "name": [
+          {
+            "family": "Doe",
+            "given": [
+              "John"
+            ]
+          }
+        ],
+        "contact": [
+          {
+            "name": {
+              "text": "Extended family"
+            },
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "EXT",
+                    "display": "extended family member"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "FRND",
+                    "display": "friend"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "PRN",
+                    "display": "parent"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "DOMPART",
+                    "display": "domestic partner"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "relationship": [
+              {
+                "coding": [
+                  {
+                    "system": "http://terminology.hl7.org/CodeSystem/v3-RoleCode",
+                    "code": "SIB",
+                    "display": "sibling"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1990-04-05",
+        "address": null
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient?identifier=urn:dhis2:anc:uniqueId|8879798"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Consent",
+        "patient": {
+          "reference": "urn:uuid:ff991a8e-db1c-dfe2-e5b1-e411451eb602"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Consent?patient.identifier=urn:dhis2:anc:uniqueId|8879798"
+      }
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+services:
+  dhis2:
+    image: "${DHIS2_IMAGE:-dhis2/core:42.5.1}"
+    restart: unless-stopped
+    volumes:
+      - ./config/dhis2/dhis.conf:/opt/dhis2/dhis.conf:ro
+    environment:
+      JAVA_OPTS: "-Dcontext.path='${DHIS2_CORE_CONTEXT_PATH:-}' -Dlog4j2.configurationFile=/opt/dhis2/log4j2.xml"
+    depends_on:
+      dhis2-db:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q -S -O /dev/null http://127.0.0.1:8080/dhis-web-login/ 2>&1| grep -q 'HTTP.*200'" ]
+      start_period: 120s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2
+      - dhis2-db
+
+  dhis2-db:
+    image: ghcr.io/baosystems/postgis:13-3.4
+    volumes:
+      - ./db-dump:/docker-entrypoint-initdb.d/:ro
+    environment:
+      POSTGRES_USER: dhis
+      POSTGRES_DB: dhis
+      POSTGRES_PASSWORD: &postgres_password dhis
+      PGPASSWORD: *postgres_password # needed by psql in healthcheck
+    healthcheck:
+      test: [ "CMD-SHELL", "psql --no-password --quiet --username $$POSTGRES_USER postgres://127.0.0.1/$$POSTGRES_DB -p 5432 --command \"SELECT 'ok'\" > /dev/null" ]
+      start_period: 120s
+      interval: 1s
+      timeout: 3s
+      retries: 5
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2-db
+
+  dhis2-reverse-proxy:
+    image: nginx
+    restart: always
+#    depends_on:
+#      seed:
+#        condition: service_completed_successfully
+    ports:
+      - "${DHIS2_PORT:-8080}:80"
+    volumes:
+      - ./config/dhis2/nginx.conf:/etc/nginx/nginx.conf:ro
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2
+      - default
+
+#  ehr:
+#    image: "hapiproject/hapi:v8.2.0-2-tomcat"
+#    volumes:
+#      - ./config/ehr/hapi.application.yaml:/data/hapi/application.yaml:ro
+#      - ./config/ehr/uv-lab-report-package.tgz:/package.tgz:ro
+#    environment:
+#      SPRING_CONFIG_LOCATION: file:///data/hapi/application.yaml
+#    healthcheck:
+#      test: [ "CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/8080" ]
+#      start_period: 120s
+#      interval: 5s
+#      timeout: 1s
+#      retries: 5
+#    security_opt:
+#      - no-new-privileges:true
+#    networks:
+#      - ehr
+
+#  fhir-sync-agent:
+#    build: ./fhir-sync-agent
+#    restart: always
+#    environment:
+#      EHR_URL: http://ehr-gateway:4180/fhir
+#      OAUTH2_TOKENENDPOINT: http://authorisation-server:8080/realms/ehr/protocol/openid-connect/token
+#      OAUTH2_CLIENTID: ehr-client
+#      OAUTH2_CLIENTSECRET: ibz2lEXdGe02CJS2N7tY13r6664eJpoX
+#      DHIS2DATABASEHOSTNAME: dhis2-db
+#      DHIS2DATABASEPORT: 5432
+#      DHIS2DATABASEUSER: dhis
+#      DHIS2DATABASEPASSWORD: dhis
+#      DHIS2DATABASEDBNAME: dhis
+#      DHIS2APIURL: http://dhis2-reverse-proxy/api
+#      DHIS2APIUSERNAME: admin
+#      DHIS2APIPASSWORD: district
+#    depends_on:
+#      authorisation-server:
+#        condition: service_healthy
+#    security_opt:
+#      - no-new-privileges:true
+#    networks:
+#      - auth
+#      - dhis2
+#      - dhis2-db
+
+#  seed:
+#    image: curlimages/curl
+#    command:
+#      - "/bin/sh"
+#      - "-c"
+#      - |
+#        curl -X PATCH -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/roles.json http://dhis2:8080/userRoles/yrB6vc5Ip3r
+#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/relying-party-service-route.json http://dhis2:8080/api/routes
+#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/pluginConfig.json http://dhis2:8080/api/dataStore/capture/dataEntryForms
+#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" http://dhis2:8080/api/appHub/e66cece4-8582-4329-81c2-043869cf1614
+#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/trackedEntityMap.json http://dhis2:8080/api/dataStore/fhirSyncAgent/trackedEntityMap
+#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d '["http://localhost:*"]' http://dhis2:8080/api/configuration/corsWhitelist
+#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -F file=@/esignet-capture-plugin.zip http://dhis2:8080/api/apps
+#    volumes:
+#      - ./config/dhis2/roles.json:/roles.json:ro
+#      - ./config/dhis2/relying-party-service-route.json:/relying-party-service-route.json:ro
+#      - ./config/dhis2/pluginConfig.json:/pluginConfig.json:ro
+#      - ./config/dhis2/trackedEntityMap.json:/trackedEntityMap.json:ro
+#      - ./esignet-capture-plugin/build/bundle/esignet-capture-plugin-1.0.0.zip:/esignet-capture-plugin.zip:ro
+#    depends_on:
+#      dhis2:
+#        condition: service_healthy
+#    security_opt:
+#      - no-new-privileges:true
+#    networks:
+#      - dhis2
+
+
+networks:
+  dhis2:
+  ehr:
+  auth:
+    internal: true
+  dhis2-db:
+    internal: true

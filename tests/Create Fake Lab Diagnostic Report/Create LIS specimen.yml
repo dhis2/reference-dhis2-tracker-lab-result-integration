@@ -1,0 +1,43 @@
+info:
+  name: Create LIS specimen
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:{{lis_port_no}}/fhir/Specimen
+  body:
+    type: json
+    data: |-
+      {
+        "resourceType": "Specimen",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/lab-report/StructureDefinition/Specimen-uv-lab"
+          ]
+        },
+        "accessionIdentifier": {
+          "value": "{{specimen_accession_identifier}}"
+        }
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: bru.runner.skipRequest()
+  actions:
+    - type: set-variable
+      phase: after-response
+      selector:
+        expression: res.body.id
+        method: jsonq
+      variable:
+        name: specimen_id
+        scope: runtime
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

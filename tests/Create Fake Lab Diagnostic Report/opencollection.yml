@@ -1,0 +1,32 @@
+opencollection: 1.0.0
+
+info:
+  name: Create Fake Lab Diagnostic Report
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  variables:
+    - name: lis_port_no
+      value: "44179"
+    - name: specimen_data_element_id
+      value: TS6Yt0weEhi
+    - name: lab_request_program_stage_id
+      value: d62zsvlENzr
+    - name: program_id
+      value: N07iEegH3Hw
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

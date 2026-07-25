@@ -1,0 +1,60 @@
+info:
+  name: Create LIS diagnostic report
+  type: http
+  seq: 5
+
+http:
+  method: POST
+  url: http://localhost:{{lis_port_no}}/fhir/DiagnosticReport
+  body:
+    type: json
+    data: |-
+      {
+        "resourceType": "DiagnosticReport",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/uv/lab-report/StructureDefinition/DiagnosticReport-uv-lab"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "11502-2",
+              "display": "Laboratory report"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/{{patient_id}}"
+        },
+        "effectiveDateTime": "2022-10-25T13:35:00+01:00",
+        "performer": [
+          {
+            "display": "MUDr. Aleš Procházka"
+          }
+        ],
+        "specimen": [
+          {
+            "reference": "Specimen/{{specimen_id}}"
+          }
+        ],
+        "result": [
+          {
+            "reference": "Observation/{{observation_id}}"
+          }
+        ]
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: bru.runner.skipRequest()
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
