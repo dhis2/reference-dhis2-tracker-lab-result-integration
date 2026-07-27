@@ -69,7 +69,7 @@ logging:
     root: INFO
 
 dhis2:
-  idsrProgram:
+  program:
     id: N07iEegH3Hw
     specimenDataElement:
       id: TS6Yt0weEhi

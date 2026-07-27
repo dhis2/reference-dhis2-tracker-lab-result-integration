@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: https://implement.im.dhis2.org/lab-ebola/api/tracker/enrollments?program={{program_id}}&status=ACTIVE&fields=events
+  url: "{{dhis2.url}}/api/tracker/enrollments?program={{program_id}}&status=ACTIVE&fields=events"
   params:
     - name: program
       value: "{{program_id}}"
@@ -25,13 +25,28 @@ runtime:
   scripts:
     - type: after-response
       code: |-
-        const dataValues = res.body.enrollments.flatMap((et) => et.events.filter((e) => (e.programStage === bru.getCollectionVar("lab_request_program_stage_id")) && (e.status === "COMPLETED")).flatMap((e) => e.dataValues)).filter((dv) => dv.dataElement === bru.getCollectionVar("specimen_data_element_id"));
+        const requestSpecimenDv = res.body.enrollments.flatMap((et) => et.events.filter((e) => (e.programStage === bru
+            .getCollectionVar("lab_request_program_stage_id")) && (e.status === "COMPLETED")).flatMap((e) => e
+            .dataValues.map((dv) => ({
+                ...dv,
+                event: e.event
+            }))).filter((dv) => dv.dataElement === bru.getCollectionVar("specimen_data_element_id")));
 
-        for (var dv of dataValues) {
-            bru.setVar("specimen_accession_identifier", dv.value);
-            await bru.runRequest("Create LIS specimen");
-            await bru.runRequest("Create LIS observation");
-            await bru.runRequest("Create LIS diagnostic report");
+        const resultSpecimenDv = res.body.enrollments.flatMap((et) => et.events.filter((e) => (e.programStage === bru
+            .getCollectionVar("lab_result_program_stage_id")) && (e.status === "COMPLETED")).flatMap((e) => e.dataValues
+            .map((dv) => ({
+                ...dv,
+                event: e.event
+            }))).filter((dv) => dv.dataElement === bru.getCollectionVar("specimen_data_element_id")));
+
+        for (var dv of requestSpecimenDv) {
+            var dataValue = dv.value
+            if (!resultSpecimenDv.find((r) => r.value === dataValue)) {
+                bru.setVar("specimen_accession_identifier", dataValue);
+                await bru.runRequest("Create LIS specimen");
+                await bru.runRequest("Create LIS observation");
+                await bru.runRequest("Create LIS diagnostic report");
+            }
         }
 
 settings:

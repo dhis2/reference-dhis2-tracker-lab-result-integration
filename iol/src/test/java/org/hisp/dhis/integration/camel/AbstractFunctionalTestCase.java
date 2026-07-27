@@ -125,13 +125,12 @@ public class AbstractFunctionalTestCase {
       String dhis2ApiUrl =
           String.format(
               "http://%s:%s/api", DHIS2_CONTAINER.getHost(), DHIS2_CONTAINER.getFirstMappedPort());
-      System.setProperty("dhis2.apiUrl", dhis2ApiUrl);
-      System.setProperty("dhis2.timeout.read", "20000");
+      System.setProperty("dhis2.api.url", dhis2ApiUrl);
 
       //      HAPI_FHIR_CONTAINER = newHapiFhirContainer();
       //      HAPI_FHIR_CONTAINER.start();
       String fhirServerUrl = String.format("http://localhost:%s/fhir", "11111111");
-      System.setProperty("fhirServerUrl", fhirServerUrl);
+      System.setProperty("lis.api.url", fhirServerUrl);
       fhirClient = FhirVersionEnum.R4.newContext().newRestfulGenericClient(fhirServerUrl);
     }
   }

@@ -74,17 +74,17 @@ public class ImportLabResultsRouteFunctionalTestCase extends AbstractFunctionalT
 
   @Autowired private Dhis2Client dhis2Client;
 
-  @Value("${dhis2.idsrProgram.id}")
-  private String dhis2IdsrProgramId;
+  @Value("${dhis2.program.id}")
+  private String dhis2ProgramId;
 
-  @Value("${dhis2.idsrProgram.labRequestProgramStage.id}")
-  private String dhis2IdsrProgramLabRequestProgramStageId;
+  @Value("${dhis2.program.labRequestProgramStage.id}")
+  private String dhis2LabRequestProgramStageId;
 
-  @Value("${dhis2.idsrProgram.labResultProgramStage.id}")
-  private String dhis2IdsrProgramLabResultProgramStageId;
+  @Value("${dhis2.program.labResultProgramStage.id}")
+  private String dhis2LabResultProgramStageId;
 
-  @Value("${dhis2.idsrProgram.specimenDataElement.id}")
-  private String dhis2IdsrProgramSpecimenDataElementId;
+  @Value("${dhis2.program.specimenDataElement.id}")
+  private String dhis2SpecimenDataElementId;
 
   @BeforeEach
   public void beforeEach() throws Exception {
@@ -185,14 +185,14 @@ public class ImportLabResultsRouteFunctionalTestCase extends AbstractFunctionalT
     List<EventsRefRef> labResultEvents = Lists.newArrayList(dhis2Client
             .get("tracker/events")
             .withField("*").withoutPaging()
-            .withParameter("program", dhis2IdsrProgramId)
+            .withParameter("program", dhis2ProgramId)
             .withParameter("status", EventsRefRef.EventStatus.COMPLETED.value())
-            .withParameter("programStage", dhis2IdsrProgramLabResultProgramStageId)
+            .withParameter("programStage", dhis2LabResultProgramStageId)
             .withParameter("trackedEntity", trackedEntityId)
             .transfer().returnAs(EventsRefRef.class, "events"));
 
     assertEquals(1, labResultEvents.size());
-    assertEquals(dhis2IdsrProgramSpecimenDataElementId, labResultEvents.get(0).getDataValues().get().get(0).getDataElement().get());
+    assertEquals(dhis2SpecimenDataElementId, labResultEvents.get(0).getDataValues().get().get(0).getDataElement().get());
     assertEquals(specimenIdUnderTest, labResultEvents.get(0).getDataValues().get().get(0).getValue().get());
   }
 
@@ -205,23 +205,23 @@ public class ImportLabResultsRouteFunctionalTestCase extends AbstractFunctionalT
             .withProgramStage("wVrLHHbixoP")
             .withOrgUnit(orgUnitId)
             .withScheduledAt(today)
-            .withProgram(dhis2IdsrProgramId)
+            .withProgram(dhis2ProgramId)
             .withStatus(EventsRefRef.EventStatus.SCHEDULE));
 
     events.add(
         new TrackerEvent()
-            .withProgramStage(dhis2IdsrProgramLabRequestProgramStageId)
+            .withProgramStage(dhis2LabRequestProgramStageId)
             .withOrgUnit(orgUnitId)
             .withOccurredAt(today)
-            .withProgram(dhis2IdsrProgramId)
+            .withProgram(dhis2ProgramId)
             .withStatus(EventsRefRef.EventStatus.COMPLETED)
             .withDataValues(
-                List.of(new TrackerDataValue().withDataElement(dhis2IdsrProgramSpecimenDataElementId).withValue(specimenId))));
+                List.of(new TrackerDataValue().withDataElement(dhis2SpecimenDataElementId).withValue(specimenId))));
 
     return List.of(
         new TrackerEnrollment()
             .withOrgUnit(orgUnitId)
-            .withProgram(dhis2IdsrProgramId)
+            .withProgram(dhis2ProgramId)
             .withEnrolledAt(today)
             .withAttributes(
                 List.of(

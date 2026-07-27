@@ -50,7 +50,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication
@@ -58,23 +57,23 @@ public class Application extends SpringBootServletInitializer implements CamelCo
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
-  @Value("${fhirServerUrl}")
-  private String fhirServerUrl;
+  @Value("${lis.api.url}")
+  private String lisApiUrl;
 
-  @Value("${dhis2.apiUrl}")
+  @Value("${dhis2.api.url}")
   private String dhis2ApiUrl;
 
-  @Value("${dhis2.username:#{null}}")
+  @Value("${dhis2.api.username:#{null}}")
   private String dhis2ApiUsername;
 
-  @Value("${dhis2.password:#{null}}")
+  @Value("${dhis2.api.password:#{null}}")
   private String dhis2ApiPassword;
 
-  @Value("${dhis2.pat:#{null}}")
-  private String dhis2Pat;
+  @Value("${dhis2.api.pat:#{null}}")
+  private String dhis2ApiPat;
 
-  @Value("${dhis2.timeout.read:10000}")
-  private int dhis2ReadTimeoutMs;
+  @Value("${dhis2.api.readTimeoutMs:10000}")
+  private int dhis2ApiReadTimeoutMs;
 
   @Autowired private ConfigurableApplicationContext applicationContext;
 
@@ -92,7 +91,7 @@ public class Application extends SpringBootServletInitializer implements CamelCo
   public IGenericClient fhirClient() {
     FhirContext fhirContext = FhirVersionEnum.R4.newContext();
     fhirContext.getRestfulClientFactory().setSocketTimeout(50000);
-    return fhirContext.newRestfulGenericClient(fhirServerUrl);
+    return fhirContext.newRestfulGenericClient(lisApiUrl);
   }
 
   @Bean
@@ -101,14 +100,14 @@ public class Application extends SpringBootServletInitializer implements CamelCo
       terminate("Missing DHIS2 API URL. Are you sure that you set `dhis2.api.url`?");
     }
 
-    if (dhis2Pat != null && (dhis2ApiUsername != null || dhis2ApiPassword != null)) {
+    if (dhis2ApiPat != null && (dhis2ApiUsername != null || dhis2ApiPassword != null)) {
       terminate(
           "Bad DHIS2 authentication configuration: PAT authentication and basic authentication are mutually exclusive. Either set `dhis2.api.pat` or both `dhis2.api.username` and `dhis2.api.password`");
     }
 
     Dhis2ClientBuilder dhis2ClientBuilder = null;
-    if (StringUtils.hasText(dhis2Pat)) {
-      dhis2ClientBuilder = Dhis2ClientBuilder.newClient(dhis2ApiUrl, dhis2Pat);
+    if (StringUtils.hasText(dhis2ApiPat)) {
+      dhis2ClientBuilder = Dhis2ClientBuilder.newClient(dhis2ApiUrl, dhis2ApiPat);
     } else if (StringUtils.hasText(dhis2ApiUsername) && StringUtils.hasText(dhis2ApiPassword)) {
       dhis2ClientBuilder =
           Dhis2ClientBuilder.newClient(dhis2ApiUrl, dhis2ApiUsername, dhis2ApiPassword);
@@ -117,7 +116,7 @@ public class Application extends SpringBootServletInitializer implements CamelCo
           "Missing DHIS2 authentication details. Are you sure that you set `dhis2.api.pat` or both `dhis2.api.username` and `dhis2.api.password`?");
     }
 
-    return dhis2ClientBuilder.withReadTimeout(dhis2ReadTimeoutMs, TimeUnit.MILLISECONDS).build();
+    return dhis2ClientBuilder.withReadTimeout(dhis2ApiReadTimeoutMs, TimeUnit.MILLISECONDS).build();
   }
 
   @Override

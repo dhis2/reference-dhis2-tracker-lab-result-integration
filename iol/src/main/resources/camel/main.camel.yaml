@@ -41,7 +41,7 @@
             variableReceive: diagnosticReportMap
         - setHeader:
             name: CamelDhis2.queryParams
-            groovy: "['program': '{{dhis2.idsrProgram.id}}', 'status': 'ACTIVE']"
+            groovy: "['program': '{{dhis2.program.id}}', 'status': 'ACTIVE']"
         - toD:
             description: Fetches the tracked entity from the DHIS2 server.
             uri: dhis2:get/collection

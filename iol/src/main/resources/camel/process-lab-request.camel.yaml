@@ -36,12 +36,12 @@
         - setVariable:
             name: specimenId
             groovy: |
-              body.dataValues.get().find {it.dataElement.get() == '{{dhis2.idsrProgram.specimenDataElement.id}}'}?.value?.get()
+              body.dataValues.get().find {it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}'}?.value?.get()
         - filter:
             groovy: |
               variables.specimenId != null
-              && variables.events.find {it.programStage.get() == '{{dhis2.idsrProgram.labResultProgramStage.id}}' 
-                && (it.dataValues.get().find {it.dataElement.get() == '{{dhis2.idsrProgram.specimenDataElement.id}}' 
+              && variables.events.find {it.programStage.get() == '{{dhis2.program.labResultProgramStage.id}}' 
+                && (it.dataValues.get().find {it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}' 
                     && it.value.get() == variables.specimenId} != null)} == null
         - setVariable:
             name: labRequestEvent

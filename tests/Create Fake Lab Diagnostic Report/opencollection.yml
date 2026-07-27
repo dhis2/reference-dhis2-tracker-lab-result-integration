@@ -17,13 +17,17 @@ config:
 request:
   variables:
     - name: lis_port_no
-      value: "44179"
+      value: "8081"
     - name: specimen_data_element_id
       value: TS6Yt0weEhi
     - name: lab_request_program_stage_id
       value: d62zsvlENzr
     - name: program_id
       value: N07iEegH3Hw
+    - name: lab_result_program_stage_id
+      value: mDvE6kdNpty
+    - name: dhis2.url
+      value: http://localhost:8080
 bundled: false
 extensions:
   bruno:

@@ -13,10 +13,9 @@
     "wait-on": "^8.0.1"
   },
   "scripts": {
-    "build-fhir-sync-agent": "mvn -B clean package -Dmaven.test.skip=true -f fhir-sync-agent/pom.xml",
-    "build-plugin": "cd esignet-capture-plugin && yarn install --frozen-lockfile && yarn build --no-verify",
-    "build": "concurrently --kill-others-on-fail \"yarn:build-fhir-sync-agent\" \"yarn:build-plugin\"",
-    "start-services": "docker compose -f esignet-docker-compose.yml -f docker-compose.yml -f tests/docker-compose.test.yml up --build --renew-anon-volumes --force-recreate --remove-orphans",
+    "build-iol": "mvn -B clean package -Dmaven.test.skip=true -f iol/pom.xml",
+    "build": "concurrently --kill-others-on-fail \"yarn:build-iol\"",
+    "start-services": "docker compose -f docker-compose.yml -f tests/docker-compose.test.yml up --build --renew-anon-volumes --force-recreate --remove-orphans",
     "start": "concurrently --kill-others-on-fail \"yarn:start-services\" \"yarn:deploy\"",
     "test": "playwright test"
   }

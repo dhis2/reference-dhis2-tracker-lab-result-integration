@@ -43,7 +43,7 @@
         - split:
             expression:
               groovy: |
-                variables.events.findAll {it.programStage.get() == '{{dhis2.idsrProgram.labRequestProgramStage.id}}'
+                variables.events.findAll {it.programStage.get() == '{{dhis2.program.labRequestProgramStage.id}}'
                   && it.status.equals(org.hisp.dhis.api.model.v42_4.EventsRefRef.EventStatus.COMPLETED)}
             steps:
               - to: direct:processLabRequest

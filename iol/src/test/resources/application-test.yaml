@@ -35,5 +35,7 @@ spring:
       password: test
 
 dhis2:
-  username: lab-interop
-  password: District123!
+  api:
+    username: lab-interop
+    password: District123!
+    readTimeoutMs: 20000
