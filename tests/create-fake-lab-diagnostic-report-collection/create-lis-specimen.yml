@@ -18,7 +18,8 @@ http:
         },
         "accessionIdentifier": {
           "value": "{{specimen_accession_identifier}}"
-        }
+        },
+        "receivedTime": "{{$randomDateRecent}}"
       }
   auth: inherit
 

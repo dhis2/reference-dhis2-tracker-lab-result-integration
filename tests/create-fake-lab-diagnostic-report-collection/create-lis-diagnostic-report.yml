@@ -29,7 +29,7 @@ http:
         "subject": {
           "reference": "Patient/{{patient_id}}"
         },
-        "effectiveDateTime": "2022-10-25T13:35:00+01:00",
+        "effectiveDateTime": "{{$randomDateRecent}}",
         "performer": [
           {
             "display": "MUDr. Aleš Procházka"

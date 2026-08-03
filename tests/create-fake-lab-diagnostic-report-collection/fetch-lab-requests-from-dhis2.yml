@@ -1,0 +1,117 @@
+info:
+  name: Fetch lab requests from DHIS2
+  type: http
+  seq: 2
+
+http:
+  method: GET
+  url: "{{dhis2.url}}/api/tracker/enrollments?program={{program_id}}&status=ACTIVE&fields=events,attributes&paging=false"
+  params:
+    - name: program
+      value: "{{program_id}}"
+      type: query
+    - name: status
+      value: ACTIVE
+      type: query
+    - name: fields
+      value: events,attributes
+      type: query
+    - name: paging
+      value: "false"
+      type: query
+  auth:
+    type: basic
+    username: "{{dhis2_username}}"
+    password: "{{dhis2_password}}"
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        var ebolaObservations = [
+          { code: "75411-9", value: "LA11882-0" },
+          { code: "75411-9", value: "LA11883-8" },
+          { code: "71768-6", value: "LA6576-8" },
+          { code: "71768-6", value: "LA6577-6" },
+          { code: "71770-2", value: "LA6576-8" },
+          { code: "71770-2", value: "LA6577-6" },
+          { code: "41637-0", value: "LA6576-8" },
+          { code: "41637-0", value: "LA6577-6" },
+        ];
+
+        const requestSpecimen = res.body.enrollments.flatMap((et) =>
+          et.events
+            .filter(
+              (e) =>
+                e.programStage ===
+                  bru.getCollectionVar("lab_request_program_stage_id") &&
+                e.status === "COMPLETED",
+            )
+            .flatMap((e) =>
+              e.dataValues.map((dv) => ({
+                ...dv,
+                event: e.event,
+                trackedEntity: et.attributes,
+              })),
+            )
+            .filter(
+              (dv) =>
+                dv.dataElement === bru.getCollectionVar("specimen_data_element_id"),
+            ),
+        );
+
+        const resultSpecimen = res.body.enrollments.flatMap((et) =>
+          et.events
+            .filter(
+              (e) =>
+                e.programStage ===
+                  bru.getCollectionVar("lab_result_program_stage_id") &&
+                e.status === "COMPLETED",
+            )
+            .flatMap((e) =>
+              e.dataValues.map((dv) => ({
+                ...dv,
+                event: e.event,
+              })),
+            )
+            .filter(
+              (dv) =>
+                dv.dataElement === bru.getCollectionVar("specimen_data_element_id"),
+            ),
+        );
+
+        const savedSpecimenIds = [];
+
+        for (var dv of requestSpecimen) {
+          const initialDiagnosis = dv.trackedEntity
+            .filter((attr) => attr.attribute === "tvaF9No9nkF")
+            .map((attr) => attr.value);
+          if (initialDiagnosis.length) {
+            if (initialDiagnosis[0] === "EBOLA") {
+              var dataValue = dv.value;
+              if (
+                !savedSpecimenIds.includes(dataValue) &&
+                !resultSpecimen.find((r) => r.value === dataValue)
+              ) {
+                const ebolaObservation =
+                  ebolaObservations[Math.floor(Math.random() * ebolaObservations.length)];
+                
+                bru.setVar("observation_code", ebolaObservation.code);
+                bru.setVar("observation_value_code", ebolaObservation.value);
+                bru.setVar("specimen_accession_identifier", dataValue);
+                
+                await bru.runRequest("create-lis-specimen");
+                await bru.runRequest("create-lis-observation");
+                await bru.runRequest("create-lis-diagnostic-report");
+              
+                savedSpecimenIds.push(dataValue);
+              }
+            }
+          }
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

@@ -49,6 +49,7 @@
               path: tracker/enrollments
               arrayName: enrollments
               fields: enrollment,events
+              paging: true
               client: "#dhis2Client"
         - split:
             simple: ${body}

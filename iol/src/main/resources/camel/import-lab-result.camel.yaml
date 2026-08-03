@@ -35,6 +35,8 @@
       steps:
         - marshal:
             fhirJson: {}
+        - unmarshal:
+            json: {}
         - convertVariableTo:
             name: labRequestEvent
             type: java.util.Map
@@ -46,7 +48,10 @@
                 bodyMediaType = new com.datasonnet.document.MediaType('application', 'json')
                 evaluate(exchange, String)
               }
-        - toD:
+        - setHeader:
+            name: CamelDhis2.queryParams
+            groovy: "['dataElementIdScheme': 'CODE']"
+        - to:
             description: Updates the lab result program stage in DHIS2.
             uri: dhis2:post/resource
             parameters:

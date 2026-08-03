@@ -31,25 +31,25 @@ http:
           "coding": [
             {
               "system": "http://loinc.org",
-              "code": "86518-8",
-              "display": "Ebola virus RNA [Presence] in Blood by NAA with probe detection"
+
+              "code": "{{observation_code}}"
             }
           ]
         },
         "subject": {
           "reference": "Patient/{{patient_id}}"
         },
-        "effectiveDateTime": "2023-03-27T11:24:26+01:00",
+        "effectiveDateTime": "{{$randomDateRecent}}",
         "performer": [
           {
             "display": "Jan Laborant"
           }
         ],
-        "dataAbsentReason": {
+        "valueCodeableConcept": {
           "coding": [
             {
-              "system": "http://terminology.hl7.org/CodeSystem/data-absent-reason",
-              "code": "not-applicable"
+              "system": "http://loinc.org",
+              "code": "{{observation_value_code}}"
             }
           ]
         }

@@ -36,6 +36,5 @@ spring:
 
 dhis2:
   api:
-    username: lab-interop
-    password: District123!
-    readTimeoutMs: 20000
+    username: admin
+    password: district

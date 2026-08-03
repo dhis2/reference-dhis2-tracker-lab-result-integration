@@ -1,0 +1,26 @@
+{
+  "events": [
+    {
+      "orgUnit": "Foo",
+      "occurredAt": "2023-03-27",
+      "status": "COMPLETED",
+      "program": "Foo",
+      "programStage": "mDvE6kdNpty",
+      "enrollment": "Foo",
+      "dataValues": [
+        {
+          "dataElement": "CS_SPECIMEN_ID",
+          "value": "<SPECIMEN_ACCESSION>"
+        },
+        {
+          "dataElement": "CS_DATE_SPECIMEN_RECEIVED_AT_LAB",
+          "value": "2026-07-26"
+        },
+        {
+          "dataElement": "CS_LAB_RT_PCR",
+          "value": "POSITIVE"
+        }
+      ]
+    }
+  ]
+}

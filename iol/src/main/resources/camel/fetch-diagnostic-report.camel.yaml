@@ -35,7 +35,7 @@
       steps:
         - setHeader:
             name: CamelFhir.url
-            simple: "/DiagnosticReport?specimen.accession=${variables.specimenId}&_include=DiagnosticReport:result"
+            simple: "/DiagnosticReport?specimen.accession=${variables.specimenId}&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen"
         - toD:
             id: searchDiagnosticReport
             uri: fhir://search/searchByUrl

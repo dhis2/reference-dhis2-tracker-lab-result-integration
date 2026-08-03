@@ -80,13 +80,12 @@ services:
     restart: always
     environment:
       LIS.API.URL: http://lis:8080/fhir
-      DHIS2.API.USERNAME: lab-interop
-      DHIS2.API.PASSWORD: District123!
+      DHIS2.API.USERNAME: admin
+      DHIS2.API.PASSWORD: district
       DHIS2.API.URL: http://dhis2-reverse-proxy/api
-      DHIS2.API.READTIMEOUTMS: 20000
     depends_on:
-      dhis2:
-        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
       lis:
         condition: service_healthy
     security_opt:
@@ -95,33 +94,22 @@ services:
       - dhis2
       - lis
 
-#  seed:
-#    image: curlimages/curl
-#    command:
-#      - "/bin/sh"
-#      - "-c"
-#      - |
-#        curl -X PATCH -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/roles.json http://dhis2:8080/userRoles/yrB6vc5Ip3r
-#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/relying-party-service-route.json http://dhis2:8080/api/routes
-#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/pluginConfig.json http://dhis2:8080/api/dataStore/capture/dataEntryForms
-#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" http://dhis2:8080/api/appHub/e66cece4-8582-4329-81c2-043869cf1614
-#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d @/trackedEntityMap.json http://dhis2:8080/api/dataStore/fhirSyncAgent/trackedEntityMap
-#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -H "Content-Type: application/json" -d '["http://localhost:*"]' http://dhis2:8080/api/configuration/corsWhitelist
-#        curl -X POST -s --max-time 0 -H "Authorization: Basic YWRtaW46ZGlzdHJpY3Q=" -F file=@/esignet-capture-plugin.zip http://dhis2:8080/api/apps
-#    volumes:
-#      - ./config/dhis2/roles.json:/roles.json:ro
-#      - ./config/dhis2/relying-party-service-route.json:/relying-party-service-route.json:ro
-#      - ./config/dhis2/pluginConfig.json:/pluginConfig.json:ro
-#      - ./config/dhis2/trackedEntityMap.json:/trackedEntityMap.json:ro
-#      - ./esignet-capture-plugin/build/bundle/esignet-capture-plugin-1.0.0.zip:/esignet-capture-plugin.zip:ro
-#    depends_on:
-#      dhis2:
-#        condition: service_healthy
-#    security_opt:
-#      - no-new-privileges:true
-#    networks:
-#      - dhis2
-
+  seed:
+    image: curlimages/curl
+    command:
+      - "/bin/sh"
+      - "-c"
+      - |
+        curl -X POST -s --max-time 0 -H "Authorization: Basic aGlzcF9hZnJpY2E6RGlzdHJpY3QxIw==" -H "Content-Type: application/json" -d @/diagnosticReportMap.json http://dhis2:8080/api/dataStore/iol/diagnosticReportMap
+    volumes:
+      - ./config/dhis2/diagnosticReportMap.json:/diagnosticReportMap.json:ro
+    depends_on:
+      dhis2:
+        condition: service_healthy
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - dhis2
 
 networks:
   dhis2:

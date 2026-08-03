@@ -28,6 +28,10 @@ request:
       value: mDvE6kdNpty
     - name: dhis2.url
       value: http://localhost:8080
+    - name: dhis2_username
+      value: admin
+    - name: dhis2_password
+      value: district
 bundled: false
 extensions:
   bruno:
