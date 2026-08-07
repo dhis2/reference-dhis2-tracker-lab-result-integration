@@ -44,7 +44,7 @@
             variableReceive: deCodeDict
         - to:
             uri: direct:getOptionValueDict
-            variableReceive: optValueCodeDict
+            variableReceive: optValueDict
         - setHeader:
             name: CamelDhis2.queryParams
             groovy: "['program': '{{dhis2.program.id}}', 'status': 'ACTIVE']"
