@@ -33,7 +33,7 @@
     from:
       uri: direct:getMappingScript
       steps:
-        - toD:
+        - to:
             description: Fetches the DataSonnet expression from the DHIS2 server's data store.
             uri: dhis2:get/resource
             parameters:

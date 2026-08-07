@@ -33,7 +33,7 @@
     from:
       uri: direct:getDeCodeDict
       steps:
-        - toD:
+        - to:
             uri: dhis2:get/collection
             parameters:
               path: dataElements

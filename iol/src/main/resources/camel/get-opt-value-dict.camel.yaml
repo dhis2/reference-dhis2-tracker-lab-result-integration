@@ -33,7 +33,7 @@
     from:
       uri: direct:getOptionValueDict
       steps:
-        - toD:
+        - to:
             uri: dhis2:get/collection
             parameters:
               path: options
