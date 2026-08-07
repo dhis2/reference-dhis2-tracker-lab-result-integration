@@ -29,9 +29,9 @@
 #
 
 - route:
-    id: getOptionValueDictRoute
+    id: getOptionCodeDictRoute
     from:
-      uri: direct:getOptionValueDict
+      uri: direct:getOptionCodeDict
       steps:
         - to:
             uri: dhis2:get/collection

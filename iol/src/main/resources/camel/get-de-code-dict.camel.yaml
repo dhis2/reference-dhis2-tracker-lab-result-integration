@@ -29,9 +29,9 @@
 #
 
 - route:
-    id: getDeCodeDictRoute
+    id: getDataElementCodeDictRoute
     from:
-      uri: direct:getDeCodeDict
+      uri: direct:getDataElementCodeDict
       steps:
         - to:
             uri: dhis2:get/collection
