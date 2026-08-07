@@ -39,6 +39,12 @@
         - to:
             uri: direct:getMappingScript
             variableReceive: diagnosticReportMap
+        - to:
+            uri: direct:getDeCodeDict
+            variableReceive: deCodeDict
+        - to:
+            uri: direct:getOptionValueDict
+            variableReceive: optValueCodeDict
         - setHeader:
             name: CamelDhis2.queryParams
             groovy: "['program': '{{dhis2.program.id}}', 'status': 'ACTIVE']"

@@ -28,54 +28,25 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-server:
-  port: 9070
-  address: 0.0.0.0
-  error:
-    whitelabel:
-      enabled: false
-  servlet:
-    session:
-      cookie:
-        same-site: strict
-
-camel:
-  springboot:
-    main-run-controller: true
-  dataformat:
-    json-jackson:
-      auto-discover-object-mapper: true
-
-management:
-  server:
-    port: 9071
-  endpoints:
-    web:
-      base-path: /management
-      exposure:
-        include: '*'
-  health:
-    show-details: always
-
-spring:
-  jmx:
-    enabled: true
-
-hawtio:
-  authenticationEnabled: false
-
-logging:
-  level:
-    root: INFO
-
-dhis2:
-  loincCodesAttribute:
-    id: LqVVfNVy594
-  program:
-    id: N07iEegH3Hw
-    specimenDataElement:
-      id: TS6Yt0weEhi
-    labRequestProgramStage:
-      id: d62zsvlENzr
-    labResultProgramStage:
-      id: mDvE6kdNpty
+- route:
+    id: getOptionValueDictRoute
+    from:
+      uri: direct:getOptionValueDict
+      steps:
+        - toD:
+            uri: dhis2:get/collection
+            parameters:
+              path: options
+              arrayName: options
+              filter: "{{dhis2.loincCodesAttribute.id}}:!null"
+              fields: "*"
+              client: "#dhis2Client"
+        - transform:
+            groovy: |
+              body.collectEntries {
+                  opt -> opt.attributeValues.find {
+                      attr -> attr.attribute.id == '{{dhis2.loincCodesAttribute.id}}'
+                  }.value.split(' ').collectEntries {
+                      v -> [(v) : opt.code]
+                  }
+              }
