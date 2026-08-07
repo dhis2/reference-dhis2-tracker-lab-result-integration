@@ -39,7 +39,7 @@
               path: dataElements
               arrayName: dataElements
               filter: "{{dhis2.loincCodesAttribute.id}}:!null"
-              fields: "*"
+              fields: code,attributeValues
               client: "#dhis2Client"
         - transform:
             groovy: |
