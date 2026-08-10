@@ -146,6 +146,7 @@ public class ImportLabResultsRouteFunctionalTestCase extends AbstractFunctionalT
                         .withAttributes(
                                 List.of(
                                         new TrackerAttribute().withAttribute("gO00x3YrZMH").withValue("BIZ605755"),
+                                        new TrackerAttribute().withAttribute("tvaF9No9nkF").withValue("EBOLA"),
                                         new TrackerAttribute().withAttribute("fncDrNotzeS"),
                                         new TrackerAttribute().withAttribute("bSssQxhP8Ic")))
                         .withEnrollments(enrol(orgUnit, specimenIdUnderTest));
