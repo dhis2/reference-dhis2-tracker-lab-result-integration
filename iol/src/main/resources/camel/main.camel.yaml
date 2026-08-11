@@ -36,15 +36,6 @@
         cron: "*/5 * * * * ?"
         stateful: true
       steps:
-        - to:
-            uri: direct:getMappingScript
-            variableReceive: diagnosticReportMap
-        - to:
-            uri: direct:getDataElementCodeDict
-            variableReceive: dataElementCodeDict
-        - to:
-            uri: direct:getOptionCodeDict
-            variableReceive: optionCodeDict
         - setHeader:
             name: CamelDhis2.queryParams
             groovy: "['program': '{{dhis2.program.id}}', 'status': 'ACTIVE']"
@@ -57,6 +48,17 @@
               fields: enrollment,events
               paging: true
               client: "#dhis2Client"
+        - filter:
+            simple: ${body.hasNext}
+        - to:
+            uri: direct:getMappingScript
+            variableReceive: diagnosticReportMap
+        - to:
+            uri: direct:getDataElementCodeDict
+            variableReceive: dataElementCodeDict
+        - to:
+            uri: direct:getOptionCodeDict
+            variableReceive: optionCodeDict
         - split:
             simple: ${body}
             steps:
