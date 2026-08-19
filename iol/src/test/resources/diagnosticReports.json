@@ -9,7 +9,7 @@
   "link": [
     {
       "relation": "self",
-      "url": "http://localhost:38547/fhir/DiagnosticReport?_include=DiagnosticReport%3Aresult&specimen.accession=<SPECIMEN_ACCESSION>"
+      "url": "http://localhost:38547/fhir/DiagnosticReport?_include=DiagnosticReport%3Aresult&_include=DiagnosticReport%3Aspecimen&specimen.accession=<SPECIMEN_ACCESSION>&status=final%2Camended%2Cappended%2Ccorrected"
     }
   ],
   "entry": [

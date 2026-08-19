@@ -41,15 +41,18 @@
               }?.value?.get()
         - filter:
             groovy: |
-              variables.specimenId != null && variables.events.find {
-                  it.programStage.get() == '{{dhis2.program.labResultProgramStage.id}}' && (it.dataValues.get().find {
-                      it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}' && it.value.get() 
-                          == variables.specimenId
-                  } != null)
-              } == null
+              variables.specimenId != null
         - setVariable:
             name: labRequestEvent
             groovy: body
+        - setVariable:
+            name: lastLabResultEvent
+            groovy: |
+              variables.events.findAll {
+                  it.programStage.get() == '{{dhis2.program.labResultProgramStage.id}}' && (it.dataValues.get().find {
+                      it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}' && it.value.get() == variables.specimenId
+                  } != null)
+              }.sort { it.createdAt }.with { isEmpty() ? null : last() }
         - to: direct:fetchDiagnosticReport
         - filter:
             simple: ${body.entry.size()} > 1

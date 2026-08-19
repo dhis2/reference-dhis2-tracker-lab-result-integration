@@ -35,7 +35,7 @@
       steps:
         - setHeader:
             name: CamelFhir.url
-            simple: "/DiagnosticReport?specimen.accession=${variables.specimenId}&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen"
+            simple: "/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=${variables.specimenId}&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt${variables.lastLabResultEvent.createdAt} ?: '0000-01-01'"
         - to:
             id: searchDiagnosticReport
             uri: fhir://search/searchByUrl
