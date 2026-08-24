@@ -37,7 +37,7 @@
             description: Fetches the DataSonnet expression from the DHIS2 server's data store.
             uri: dhis2:get/resource
             parameters:
-              path: dataStore/iol/diagnosticReportTransfromScript
+              path: dataStore/iol/diagnosticReportTranformScript
               client: "#dhis2Client"
         - unmarshal:
             json: { }

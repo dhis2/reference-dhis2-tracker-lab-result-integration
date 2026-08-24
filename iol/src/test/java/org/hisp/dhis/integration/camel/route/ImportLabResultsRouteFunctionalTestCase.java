@@ -130,10 +130,10 @@ public class ImportLabResultsRouteFunctionalTestCase extends AbstractFunctionalT
         spyEndpoint.setExpectedCount(1);
 
         dhis2Client
-                .post("dataStore/iol/diagnosticReportTransfromScript")
+                .post("dataStore/iol/diagnosticReportTranformScript")
                 .withResource(
                         IOUtils.toString(
-                                new File("../config/dhis2/diagnosticReportTransfromScript.json").toURI(),
+                                new File("../config/dhis2/diagnosticReportTranformScript.json").toURI(),
                                 Charset.defaultCharset()))
                 .transfer()
                 .close();
