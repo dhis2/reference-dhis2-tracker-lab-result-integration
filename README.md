@@ -27,11 +27,13 @@
 
 ## What is this implementation?
 
-DHIS2 Tracker programmes can be configured to support case-based disease surveillance and EMR functions such as patient health record. Often lab results need to be entered into such programmes to inform the decision-making of health professionals. In contrast to manual data entry, sending electronically the lab results to DHIS2 helps speed up this decision-making, eliminate manual transcribing errors between systems, as well as improve the information availability to all health and management staff. A Laboratory Information System (LIS) is typically the primary source of lab results destined to other information systems. With the generous support of US CDC, HISP Centre developed this reference implementation to demonstrate the electronic transmission of lab results from a LIS to DHIS2, improving the timeliness and quality of such results in Tracker programmes.
+DHIS2 Tracker programmes can be configured to support case-based disease surveillance and EMR functions such as patient health record. Often laboratory results need to be entered into such programmes to inform the decision-making of health professionals. In contrast to manual data entry, sending electronically the laboratory results to DHIS2 helps speed up this decision-making, eliminate manual transcribing errors between systems, as well as improve the information availability to all health and management staff. 
+
+A Laboratory Information System (LIS) is typically the primary source of laboratory results destined to other information systems. With the generous support of US CDC, HISP Centre developed this reference implementation to demonstrate the electronic transmission of lab results from a LIS to DHIS2, improving the timeliness and quality of such results in Tracker programmes.
 
 As defined in [Laboratory Information Systems Project Management: A Guidebook for International Implementations](https://aphl.org/docs/default-source/technical/gh-2019may-lis-guidebook-web.pdf), a LIS is a _computer-based information management systems created specifically for laboratories, to support workflow, track data from the start to the end of the testing process, store data, and provide correct and complete information to laboratory staff, managers, and customers in a timely manner allowing for decision making by clinicians, epidemiologists and other stakeholders_.
 
-This reference implementation imports the lab results from a LIS into a DHIS2 Tracker programme used for case-based disease surveillance. The import is accomplished by (1) fetching lab diagnostic reports from a mock LIS conforming to the HL7 Laboratory FHIR Implementation Guide, (2) transforming them into Tracker events, and then (3) transmitting the events to DHIS2. The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
+This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker programme used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the HL7 Laboratory FHIR Implementation Guide, (2) transforming them into Tracker events, and then (3) transmitting the events to DHIS2's Web API. The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
 
 This is an example meant to technically guide you in developing your own integration between an LIS and DHIS2. It **SHOULD NOT** be used directly in production without adapting it to your local context.
 
@@ -40,7 +42,7 @@ This is an example meant to technically guide you in developing your own integra
 1. From the machine where you intend to run the reference implementation:
    1. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
    2. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and then run the command shown next to download the reference implementation repository: `git clone https://github.com/dhis2/reference-dhis2-tracker-lis-integration.git`
-   3. [Install the Bruno script runner](https://docs.usebruno.com/bru-cli/installation) for simulating the lab analyser that sends the diagnostic results to the LIS
+   3. [Install the Bruno script runner](https://docs.usebruno.com/bru-cli/installation) for simulating the laboratory analyser that sends the diagnostic results to the LIS
 2. Within a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration` and run `docker compose up --wait --remove-orphans`. Wait until the command completes before moving on to the next step. This command will stand up:
    * DHIS2 which is reachable from `http://localhost:8080/`
    * a mock LIS which is reachable from `http://localhost:8081/`
@@ -56,9 +58,9 @@ This is an example meant to technically guide you in developing your own integra
    1. Choose a date from the _Date of data entry_ date picker
    2. Insert a random identifier like `123456` in the _Specimen ID_ field (the specimen ID must always be unique across all lab request events)
    3. Press the `Complete` button, located at bottom of the form
-7. From a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration/tests/create-fake-lab-diagnostic-report-collection` and launch `bru run` to simulate the lab analyser. Wait until the command completes before moving on to the next step.
-8. Wait at least a minute before refreshing the DHIS2 enrollment dashboard in order to give time for the LIS lab result to be synced with DHIS2. After the refresh, an event should appear under the _Lab result_ section of the enrollment dashboard but try refreshing the page a couple of more times if the event does not show up.
-9. Open the lab result event to view the lab diagnosis confirming or refuting the initial Ebola diagnosis.
+7. From a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration/tests/create-fake-lab-diagnostic-report-collection` and launch `bru run` to simulate the laboratory analyser. Wait until the command completes before moving on to the next step.
+8. Wait at least a minute before refreshing the DHIS2 enrollment dashboard in order to give time for the LIS laboratory result to be synced with DHIS2. After the refresh, an event should appear under the _Lab result_ section of the enrollment dashboard but try refreshing the page a couple of more times if the event does not show up.
+9. Open the lab result event to view the laboratory diagnosis confirming or refuting the initial Ebola diagnosis.
 
 ## Overview
 
@@ -74,13 +76,13 @@ The role assigned to DHIS2 in this reference implementation is that of an [integ
 
 ![Case surveillance program](docs/case-surveillance-program.png)
 
-The following sections drill down into the stages which are relevant to the lab result integration.
+The following sections drill down into the stages which are relevant to the laboratory result integration.
 
 #### Enrollment Stage
 
 A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enroll the person into the programme. As shown below, the initial diagnosis can be either Cholera, Ebola, or Mpox:
 
-
+![Enrollment form](docs/enrollment-form.png)
 
 #### Lab Request Stage
 
@@ -88,7 +90,7 @@ The lab request stage is used for reporting the lab order and to link the LIS la
 
 ![Lab request form](docs/lab-request-form.png)
 
-The specimen ID field shown above is mandatory as is expected to be unique for each lab request, even across cases. In other settings, instead of the specimen ID, alternative or additional unique linking identifiers could be required such as the patient name or the case ID, each with their own tradeoffs.
+The specimen ID field shown above is mandatory and is expected to be unique for each lab request, even across cases. In other settings, instead of the specimen ID, alternative or additional unique linking identifiers could be required such as the patient name or the case ID, each with their own tradeoffs.
 
 Completing the lab request form does not trigger a lab order. It is assumed that the lab test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a test kit that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding fake lab reports, and pushes the reports to the LIS.
 
@@ -110,7 +112,11 @@ As part of the lab result integration, DHIS2 drives the transformation and termi
 
 
 
-While in terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. The the Interoperability Layer section of this documentation explains ....
+In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps the value `POSITIVE` to either the LOINC code `LA11882-0` or `LA6576-8`. 
+
+![Option set value](docs/option-set-value.png)
+
+The the Interoperability Layer section of this documentation explains ....
 
 ### Lab Information System
 
