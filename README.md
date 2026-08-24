@@ -121,7 +121,7 @@ The interoperability layer (IOL) is a low-code and customisable [Apache Camel](h
    1. Fetch from DHIS2:
       1. data element codes that have LOINC code attributes present using the HTTP call `.../api/dataElements?LqVVfNVy594:!null&fields=code,attributeValues`
       2. option set value codes have LOINC code attributes present using the HTTP call `.../api/options?LqVVfNVy594:!null&fields=code,attributeValues`
-      3. the DataSonnet script from the data store using the HTTP call `.../api/dataStore/iol/diagnosticReportTranformScript`
+      3. the DataSonnet script from the data store using the HTTP call `.../api/dataStore/iol/diagnosticReportTransformScript`
 
    2. Search for completed lab requests within the downloaded active cases such that the event program stage ID is equal to `N07iEegH3Hw` and the status is equal to `COMPLETED`. 
 

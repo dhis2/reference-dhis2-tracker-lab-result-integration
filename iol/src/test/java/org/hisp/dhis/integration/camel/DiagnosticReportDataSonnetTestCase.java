@@ -60,7 +60,7 @@ public class DiagnosticReportDataSonnetTestCase {
         String dataSonnetExpression =
                 StringEscapeUtils.unescapeJson(
                         IOUtils.toString(
-                                new File("../config/dhis2/diagnosticReportTranformScript.json").toURI(),
+                                new File("../config/dhis2/diagnosticReportTransformScript.json").toURI(),
                                 Charset.defaultCharset()));
         dsExpression = new DatasonnetExpression(dataSonnetExpression.substring(1, dataSonnetExpression.length() - 1));
         dsExpression.setResultType(Map.class);

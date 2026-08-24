@@ -100,9 +100,9 @@ services:
       - "/bin/sh"
       - "-c"
       - |
-        curl -X POST -s --max-time 0 -H "Authorization: Basic aGlzcF9hZnJpY2E6RGlzdHJpY3QxIw==" -H "Content-Type: application/json" -d @/diagnosticReportTranformScript.json http://dhis2:8080/api/dataStore/iol/diagnosticReportTranformScript
+        curl -X POST -s --max-time 0 -H "Authorization: Basic aGlzcF9hZnJpY2E6RGlzdHJpY3QxIw==" -H "Content-Type: application/json" -d @/diagnosticReportTransformScript.json http://dhis2:8080/api/dataStore/iol/diagnosticReportTransformScript
     volumes:
-      - ./config/dhis2/diagnosticReportTranformScript.json:/diagnosticReportTranformScript.json:ro
+      - ./config/dhis2/diagnosticReportTransformScript.json:/diagnosticReportTransformScript.json:ro
     depends_on:
       dhis2:
         condition: service_healthy

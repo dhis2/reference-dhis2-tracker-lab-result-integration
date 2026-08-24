@@ -42,7 +42,7 @@
             type: java.util.Map
         - transform:
             groovy: |
-              camelContext.resolveLanguage('datasonnet').createExpression(variables.get('diagnosticReportTranformScript')).with {
+              camelContext.resolveLanguage('datasonnet').createExpression(variables.get('diagnosticReportTransformScript')).with {
                 outputMediaType = new com.datasonnet.document.MediaType('application', 'json')
                 resultType = String
                 bodyMediaType = new com.datasonnet.document.MediaType('application', 'json')
