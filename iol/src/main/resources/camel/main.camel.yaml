@@ -52,7 +52,7 @@
             simple: ${body.hasNext}
         - to:
             uri: direct:getMappingScript
-            variableReceive: diagnosticReportMap
+            variableReceive: diagnosticReportTransfromScript
         - to:
             uri: direct:getDataElementCodeDict
             variableReceive: dataElementCodeDict

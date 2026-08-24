@@ -68,6 +68,9 @@ logging:
   level:
     root: INFO
 
+main:
+  interval: "*/5 * * * * ?"
+
 dhis2:
   loincCodesAttribute:
     id: LqVVfNVy594
