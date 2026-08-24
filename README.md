@@ -129,17 +129,13 @@ The interoperability layer (IOL) is a low-code and customisable [Apache Camel](h
 
    4. Record the `createdAt` timestamp of the most recent lab result should there be one or more corresponding lab results. This timestamp allows the IOL to fetch the LIS diagnostic report after the `createdAt` of the most recent lab result.
 
-   5. Fetched the diagnostic report from the LIS for a given lab request with the HTTP call `/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[lastLabResultCreatedAt]` where:
+   5. Fetch the diagnostic report from the LIS for a given lab request with the HTTP call `/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[lastLabResultCreatedAt]` where:
       * `[specimenId]` is substituted with the lab request specimen ID, and 
       * `[lastLabResultCreatedAt]` is substituted with the `createdAt` of the most recent lab result for `[specimenId]`. `[lastLabResultCreatedAt]` defaults to `0000-01-01` if no such lab result exists to indicate that the diagnostic report should be retrieved regardless
 
    6. Transform the diagnostic report, if returned, into a DHIS2 event using the DataSonnet script fetched in step _2ia_ and where the LOINC codes are mapped into data element and option set value codes using mapping downloaded from step _2ib_ and _2ic_
 
    7. Import the event into DHIS2 with an HTTP POST sent the endpoint `.../api/tracker?async=false` where the `async` query parameter is set to `false` in order to import the event synchronously.
-
-The IOL pulls out the specimen IDs from these lab requests and then searches for FHIR diagnostic reports in the LIS that match these specimen IDs.
-
-Prior to transmitting the lab result to DHIS2, the IOL transforms the FHIR diagnostic report together with its linked FHIR observations and specimen resources into a DHIS2 event resource. However, it is DHIS2 itself that drives the JSON transformation and the terminology mapping. This is thanks to the DHIS2 data store and metadata attributes. The data store key `iol/diagnosticReportTransfromScript` holds the DataSonnet script that is fetched and executed in the IOL to translate the FHIR JSON into DHIS2 JSON while the data element and option values attributes hold the LOINC codes permitting the LOINC terminology to be mapped to DHIS2 data elements and their values (e.g., 75411-9 -> CS_LAB_RT_P..). At the start of each poll, the IOL fetches the DataSonnet script to execute in the engine and the terminology mappings to apply to the LOINC codes. The DHIS2 implementer benefits from this separation of logic because it is transformation and mapping logic that is most likely to change over rtime. The DHIS2 implementer can revise the LOINC-to-DHIS2 code mappings without needing to enlist the team maintaing the IOL. A step futher, haivng proficiency in DataSonnet enables the DHIS2 implementer
 
 The IOL is configured through one or more YAML files. The subsequent table lists the parameters that can be configured in the IOL:
 
