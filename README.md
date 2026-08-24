@@ -18,7 +18,7 @@ This is an example meant to technically guide you in developing your own integra
 
 1. From the machine where you intend to run the reference implementation:
    1. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
-   2. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and then run the command shown next to download the reference implementation repository: `git clone https://github.com/dhis2/reference-dhis2-tracker-lis-integration.git`
+   2. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) and then run the command shown next to download the reference implementation repository: `git clone https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration.git`
    3. [Install the Bruno script runner](https://docs.usebruno.com/bru-cli/installation) for simulating the laboratory analyser that sends the diagnostic results to the LIS
 2. Within a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration` and run `docker compose up --wait --remove-orphans`. Wait until the command completes before moving on to the next step. This command will stand up:
    * DHIS2 which is reachable from `http://localhost:8080/`
@@ -77,11 +77,11 @@ Following the lab request is the lab result program stage. This is the stage tha
 
 ![Lab result form](docs/lab-result-form.png)
 
-There can be multiple lab results for a given lab request as shown next:
+There can be multiple lab results for a given lab request as shown in this extract of an enrollment dashboard:
 
 ![Lab result events](docs/lab-result-events.png)
 
-The successive lab results represent corrections or amendments in the LIS diagnostic report. The individual lab result shows its status change in the event notes section like what is presented here:
+The successive lab results represent corrections or amendments in the source laboratory report. The individual lab result shows its status change in the event notes section like what is presented here:
 
 ![Lab result notes](docs/lab-result-notes.png)
 
@@ -89,7 +89,7 @@ The successive lab results represent corrections or amendments in the LIS diagno
 
 As part of the lab result integration, DHIS2 drives the transformation and terminology mapping such that the lab result can be imported into DHIS2. In terms of FHIR-to-DHIS2 JSON transformation, the DHIS2 data store holds the [DataSonnet](https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html) script translating the FHIR resources into DHIS2 resources:
 
-[TODO]
+![FHIR-to-DHIS2 transform script](docs/datastore-transform-script.png)
 
 In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps either the LOINC code `LA11882-0` or `LA6576-8` to the option set value `POSITIVE`. 
 
