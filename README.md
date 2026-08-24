@@ -33,7 +33,7 @@ A Laboratory Information System (LIS) is typically the primary source of laborat
 
 As defined in [Laboratory Information Systems Project Management: A Guidebook for International Implementations](https://aphl.org/docs/default-source/technical/gh-2019may-lis-guidebook-web.pdf), a LIS is a _computer-based information management systems created specifically for laboratories, to support workflow, track data from the start to the end of the testing process, store data, and provide correct and complete information to laboratory staff, managers, and customers in a timely manner allowing for decision making by clinicians, epidemiologists and other stakeholders_.
 
-This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker programme used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the HL7 Laboratory FHIR Implementation Guide, (2) transforming them into Tracker events, and then (3) transmitting the events to DHIS2's Web API. The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
+This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker programme used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming them into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
 
 This is an example meant to technically guide you in developing your own integration between an LIS and DHIS2. It **SHOULD NOT** be used directly in production without adapting it to your local context.
 
@@ -76,11 +76,11 @@ The role assigned to DHIS2 in this reference implementation is that of an [integ
 
 ![Case surveillance program](docs/case-surveillance-program.png)
 
-The following sections drill down into the stages which are relevant to the laboratory result integration.
+The following sections drill down into the stages that are relevant to the laboratory result integration.
 
 #### Enrollment Stage
 
-A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enroll the person into the programme. As shown below, the initial diagnosis can be either Cholera, Ebola, or Mpox:
+A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enroll the person into the programme. In the enrollment form shown below, the initial diagnosis can be either cholera, ebola, or mpox.
 
 ![Enrollment form](docs/enrollment-form.png)
 
@@ -92,37 +92,41 @@ The lab request stage is used for reporting the lab order and to link the LIS la
 
 The specimen ID field shown above is mandatory and is expected to be unique for each lab request, even across cases. In other settings, instead of the specimen ID, alternative or additional unique linking identifiers could be required such as the patient name or the case ID, each with their own tradeoffs.
 
-Completing the lab request form does not trigger a lab order. It is assumed that the lab test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a test kit that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding fake lab reports, and pushes the reports to the LIS.
+Completing the lab request form does not trigger a laboratory order. It is assumed that the laboratory test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a test kit that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding laboratory lab reports, and pushes the reports to the LIS.
 
 #### Lab Result Stage
 
-Following the lab request is the lab result program stage. This is the stage that integrates with the LIS through the Interoperability Layer as described in the next section. Automatically, a lab result is imported into the ongoing case when a lab report becomes available from the LIS and has a specimen ID linking it to a lab request in DHIS2. The outcome is a completed lab result data entry form like the following:
+Following the lab request is the lab result program stage. This is the stage that has its form auto-populated with the results from the LIS through the Interoperability Layer as described in the next section. Without human intervention, a lab result is imported into the ongoing case when a laboratory report becomes available from the LIS that has a specimen ID linking it to the prior lab request in DHIS2. The outcome is a completed lab result data entry form like the following:
 
 ![Lab result form](docs/lab-result-form.png)
 
-From the Capture app, the surveillance officer enrols a suspected person of a notifiable disease into the _Case Surveillance_ program. On enrolling a person with an initial diagnosis, such as Ebola, the surveillance officer proceeds to the lab request program stage to issue a lab order so that the subsequent test result confirms the initial diagnosis.
+There can be multiple lab results for a given lab request as shown next:
 
-The lab request program stage requires at minimum the specimen ID. This ID is the unique identifier allowing the corresponding LIS lab report to be linked to the DHIS2 lab result program stage. In many settings, instead of the specimen ID, alternative or additional unique identifiers could be required such as the patient name or the case ID, each with their own tradeoffs. The specimen ID allows us to handle situations 
+![Lab result events](docs/lab-result-events.png)
 
-When the lab request stage is completed, the IOL picks up the lab request and attempts to reconcile it with a diagnostic report from the LIS.
+The successive lab results represent corrections or amendments in the LIS diagnostic report. The individual lab result shows its status change in the event notes section like what is presented here:
+
+![Lab result notes](docs/lab-result-notes.png)
 
 ---
 
 As part of the lab result integration, DHIS2 drives the transformation and terminology mapping such that the lab result can be imported into DHIS2. In terms of FHIR-to-DHIS2 JSON transformation, the DHIS2 data store holds the script translating the FHIR resources into DHIS2 resources:
 
+[TODO]
 
-
-In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps the value `POSITIVE` to either the LOINC code `LA11882-0` or `LA6576-8`. 
+In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps either the LOINC code `LA11882-0` or `LA6576-8` to the option set value `POSITIVE`. 
 
 ![Option set value](docs/option-set-value.png)
 
-The the Interoperability Layer section of this documentation explains ....
+The Interoperability Layer reads the terminology mapping  section of this documentation explains ....
 
 ### Lab Information System
 
-The LIS is the source of the lab results in the DHIS2 case surveillance programme. In the real world, one or more lab analysers would run tests on the specimen and then report their results to the LIS for storage and analysis. However, in this reference implementation, a script runner is used instead to fake the results and transmit them to the LIS. These results are in turn read by the Interoperability Layer as described in the next section.
+The LIS is the source of the lab results in the DHIS2 case surveillance programme. In the real world, one or more laboratory analysers would run tests on the specimen and then report their results to the LIS for storage and analysis. However, in this reference implementation, a script runner is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the Interoperability Layer as described in the next section.
 
-HAPI FHIR is the server powering the LIS. It is an open-source FHIR server that allows us to keep the integration decoupled from any particular LIS interface. FHIR (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard. The HAPI FHIR server is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). At the time of writing, the guide is still in draft stage, nevertheless, it was selected to represent the lab result communication due to its broad scope thanks to the participation of experts from several countries, projects, and initiatives. The IG profiles several resources, though for the purposes of this project, the follow FHIR resources are of primary interest:
+HAPI FHIR is the server powering the mock LIS. FHIR (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface. HAPI FHIR is a popular open-source server implementation of FHIR and is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). At the time of writing, the guide is still in draft stage, nevertheless, it was selected to represent the lab result communication due to its broad scope thanks to the participation of experts from several countries, projects, and initiatives. 
+
+The IG profiles several FHIR resources though the following are used in this project:
 
 * Specimen: holds the specimen ID and the date the specimen was received at the lab
 * Observation: contains the LOINC codes identifying the test carried out and its result
@@ -136,22 +140,30 @@ The interoperability layer (IOL) is a low-code and customisable Apache Camel app
 Prior to transmitting the lab result to DHIS2, the IOL transforms the FHIR diagnostic report together with its linked FHIR observations and specimen resources into a DHIS2 event resource. However, it is DHIS2 itself that drives the JSON transformation and the terminology mapping. This is thanks to the DHIS2 data store and metadata attributes. The data store key `iol/diagnosticReportMap` holds the DataSonnet script that is fetched and executed in the IOL to translate the FHIR JSON into DHIS2 JSON while the data element and option values attributes hold the LOINC codes permitting the LOINC terminology to be mapped to DHIS2 data elements and their values (e.g., 75411-9 -> CS_LAB_RT_P..). At the start of each poll, the IOL fetches the DataSonnet script to execute in the engine and the terminology mappings to apply to the LOINC codes. The DHIS2 implementer benefits from this separation of logic because it is transformation and mapping logic that is most likely to change over rtime. The DHIS2 implementer can revise the LOINC-to-DHIS2 code mappings without needing to enlist the team maintaing the IOL. A step futher, haivng proficiency in DataSonnet enables the DHIS2 implementer
 
 
-|           **Parameter Name**            | **Description**                                                                                                   |
-|:---------------------------------------:|:------------------------------------------------------------------------------------------------------------------|
-|              dhis2.api.url              | Web API base path of the DHIS2 server                                                                             |
-|           dhis2.api.username            | Username of the DHIS2 Web API user. Required when not using PAT authentication                                    |
-|           dhis2.api.password            | Password of the DHIS2 Web API user. Required when not using PAT authentication                                    |
-|              dhis2.api.pat              | PAT of the DHIS2 server Web API user. Required when not using basic access authentication                         |
-|         dhis2.api.readTimeoutMs         | Base URL used in approval links sent to the target. If unset, the app will attempt to resolve the base URL itself |
-|      dhis2.loincCodesAttribute.id       | Base URL used in approval links sent to the target. If unset, the app will attempt to resolve the base URL itself |
-|            dhis2.program.id             | Address for connecting to the broker                                                                              |
-|  dhis2.program.specimenDataElement.id   | Reference to a connection factory Java class used for establishing connections to the broker                      |
-| dhis2.program.labRequestProgramStage.id | Specifies the Camel runtime version                                                                               |
-| dhis2.program.labResultProgramStage.id  | Specifies the Camel runtime version                                                                               |
-|               lis.api.url               | Base URL used in approval links sent to the target. If unset, the app will attempt to resolve the base URL itself |
+|           **Parameter Name**            | **Description**                                                                           |
+|:---------------------------------------:|:------------------------------------------------------------------------------------------|
+|              dhis2.api.url              | Web API base path of the DHIS2 server                                                     |
+|           dhis2.api.username            | Username of the DHIS2 Web API user. Required when not using PAT authentication            |
+|           dhis2.api.password            | Password of the DHIS2 Web API user. Required when not using PAT authentication            |
+|              dhis2.api.pat              | PAT of the DHIS2 server Web API user. Required when not using basic access authentication |
+|         dhis2.api.readTimeoutMs         | TODO                                                                                      |
+|      dhis2.loincCodesAttribute.id       | TODO                                                                                      |
+|            dhis2.program.id             | TODO                                                                                      |
+|  dhis2.program.specimenDataElement.id   | TODO                                                                                      |
+| dhis2.program.labRequestProgramStage.id | TODO                                                                                      |
+| dhis2.program.labResultProgramStage.id  | TODO                                                                                      |
+|               lis.api.url               | TODO                                                                                      |
+
+## Privacy Considerations
+
+TODO
+
+## Security Considerations
+
+TODO
 
 
 ## Performance Considerations
 
-* The no. of requests the LIS receives is pr 
+TODO
 
