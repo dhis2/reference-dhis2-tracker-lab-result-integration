@@ -122,22 +122,22 @@ The interoperability layer (IOL) is a low-code and customisable [Apache Camel](h
 
    1. Fetch from DHIS2:
       1. data element codes that have LOINC code attributes present using the GET HTTP call `.../api/dataElements?LqVVfNVy594:!null&fields=code,attributeValues`
-      2. option set value codes have LOINC code attributes present using the GETT HTTP call `.../api/options?LqVVfNVy594:!null&fields=code,attributeValues`
+      2. option set value codes have LOINC code attributes present using the GET HTTP call `.../api/options?LqVVfNVy594:!null&fields=code,attributeValues`
       3. the DataSonnet script from the data store using the GET HTTP call `.../api/dataStore/iol/diagnosticReportTransformScript`
 
-   2. Search for completed lab requests within the fetched active cases such that the event program stage ID is equal to `N07iEegH3Hw` (i.e., the lab request program stage) and the status is equal to `COMPLETED`. 
+   2. Search for events within the fetched active cases such that the event program stage ID is equal to `N07iEegH3Hw` (i.e., the lab request program stage) and the status is equal to `COMPLETED`. 
 
    3. For each lab request, extract its specimen ID and collect into a list any lab results found within the enrollment matching the specimen ID. It is assumed that if one or more lab results are found in the case, then a diagnostic report in the LIS for the lab request already exists.
 
    4. Record the `createdAt` timestamp of the most recent lab result should there be one or more corresponding lab results for the give lab request. This timestamp enables the IOL to fetch the LIS diagnostic report which after the `createdAt` of the most recent lab result.
 
-   5. Search for _final_, _amended_, _appended_, or _corrected_ diagnostic reports by the lab request specimen ID in the LIS. A key constraint in the reference implementation is that the specimen ID is unique across laboratory orders so the IOL assumes that the LIS returns at most a single diagnostic report for a given specimen ID. The behaviour for multiple diagnostic reports in the search result is undefined. The GET HTTP call to search the reports is  `.../fhir/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[lastLabResultCreatedAt]` where:
+   5. Search for _final_, _amended_, _appended_, or _corrected_ diagnostic reports by the lab request specimen ID in the LIS. A key constraint in the reference implementation is that the specimen ID is unique across laboratory orders so the IOL assumes that the LIS returns at most a single diagnostic report for a given specimen ID. The IOL behaviour when multiple diagnostic reports are in the search result is undefined. The GET HTTP call to search the reports is  `.../fhir/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[lastLabResultCreatedAt]` where:
       * `[specimenId]` is substituted with the lab request specimen ID, and 
       * `[lastLabResultCreatedAt]` is substituted with the `createdAt` of the most recent lab result for `[specimenId]`. The IOL defaults `[lastLabResultCreatedAt]` to `0000-01-01` if no lab results exist to indicate that the diagnostic report should be retrieved regardless of when its update occurred.  
 
-   6. Transform the diagnostic report, if returned, into a DHIS2 event using the DataSonnet script fetched in step _2ia_ and where the LOINC codes are mapped into data element and option set value codes using mapping downloaded from step _2ib_ and _2ic_
+   6. Transform the diagnostic report, if returned, into a DHIS2 event using the DataSonnet script fetched in step _2ia_ and map the LOINC codes into data element and option set value codes by looking up the mappings downloaded from step _2ib_ and _2ic_
 
-   7. Import the event into DHIS2 with an HTTP POST sent the endpoint `.../api/tracker?async=false` where the `async` query parameter is set to `false` in order to import the event synchronously.
+   7. Import the event into DHIS2 with an HTTP POST sent to the endpoint `.../api/tracker?async=false` where the `async` query parameter is set to `false` so that the event is imported synchronously leading to any imported being reported and logged immediately.
 
 The IOL is configured through one or more YAML files. The subsequent table lists the parameters that can be configured in the IOL:
 
@@ -168,3 +168,6 @@ TODO
 
 TODO
 
+# Support
+
+Questions or feedback about this reference implementation can be posted on the [DHIS2 Community of Practice](https://community.dhis2.org/). Contributions in the form of [pull requests](https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration/pulls) are more than welcome.
