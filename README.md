@@ -10,7 +10,7 @@ A Laboratory Information System (LIS) is typically the primary source of laborat
 
 As defined in [Laboratory Information Systems Project Management: A Guidebook for International Implementations](https://aphl.org/docs/default-source/technical/gh-2019may-lis-guidebook-web.pdf), a LIS is a _computer-based information management systems created specifically for laboratories, to support workflow, track data from the start to the end of the testing process, store data, and provide correct and complete information to laboratory staff, managers, and customers in a timely manner allowing for decision making by clinicians, epidemiologists and other stakeholders_.
 
-This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker program used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
+This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker program used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the structural and semantic differences between FHIR and DHIS2.
 
 This is an example meant to technically guide you in developing your own integration between an LIS and DHIS2. It **SHOULD NOT** be used directly in production without adapting it to your local context.
 
@@ -23,7 +23,7 @@ This is an example meant to technically guide you in developing your own integra
 2. Within a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration` and run `docker compose up --wait --remove-orphans`. Wait until the command completes before moving on to the next step. This command will stand up:
    * DHIS2 which is reachable from `http://localhost:8080/`
    * a mock LIS which is reachable from `http://localhost:8081/`
-   * the interoperability layer running as a background process
+   * the IOL running as a background process
 3. From your browser, type the following in the address bar to open the enrollment form for the case surveillance program: http://localhost:8080/apps/capture#/new?orgUnitId=DiszpKrYNg8&programId=N07iEegH3Hw. Alternatively, follow these steps:
    1. Open the Capture app from the DHIS2 dashboard in your local DHIS2 instance on `http://localhost:8080/`
    2. Expand the _Program_ drop-down box and pick _Case Surveillance_ 
@@ -73,7 +73,7 @@ Completing the lab request form does not trigger a laboratory order. It is assum
 
 #### Lab Result Stage
 
-Following the lab request is the lab result program stage. This is the stage that has its form auto-populated with the results from the LIS through the Interoperability Layer as described in the next section. Without human intervention, a lab result is imported into the ongoing case when a laboratory report that has a specimen ID linking it to the lab request in DHIS2 becomes available in the LIS. The outcome is a completed lab result data entry form like the following:
+Following the lab request is the lab result program stage. This is the stage that has its form auto-populated with the results from the LIS through the IOL as described in the next section. Without human intervention, a lab result is imported into the ongoing case when a laboratory report that has a specimen ID linking it to the lab request in DHIS2 becomes available in the LIS. The outcome is a completed lab result data entry form like the following:
 
 ![Lab result form](docs/lab-result-form.png)
 
@@ -87,7 +87,7 @@ The successive lab results represent corrections or amendments in the source lab
 
 ---
 
-As part of the lab result integration, DHIS2 drives the transformation and terminology mapping in the Interoperability Layer such that the lab result can be imported into DHIS2. In terms of FHIR-to-DHIS2 JSON transformation, the DHIS2 data store holds the [DataSonnet](https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html) script translating the FHIR resources into DHIS2 resources.
+As part of the lab result integration, DHIS2 drives the transformation and terminology mapping in the IOL such that the lab result can be imported into DHIS2. In terms of FHIR-to-DHIS2 JSON transformation, the DHIS2 data store holds the [DataSonnet](https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html) script translating the FHIR resources into DHIS2 resources.
 
 ![FHIR-to-DHIS2 transform script](docs/datastore-transform-script.png)
 
@@ -101,7 +101,7 @@ The DHIS2 implementer benefits from having the transformation of the lab result 
 
 ### Lab Information System
 
-The LIS is the source of the lab results in the DHIS2 case surveillance program. In the real world, one or more laboratory analysers would run tests on the specimen and then report their results to the LIS for storage and analysis. However, in this reference implementation, a script runner is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the Interoperability Layer as described in the next section.
+The LIS is the source of the lab results in the DHIS2 case surveillance program. In the real world, one or more laboratory analysers would run tests on the specimen and then report their results to the LIS for storage and analysis. However, in this reference implementation, a script runner is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
 
 HAPI FHIR is the server powering the mock LIS. FHIR (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface. HAPI FHIR is a popular open-source server implementation of FHIR and is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). At the time of writing, the guide is still in draft stage, nevertheless, it was selected to represent the lab result communication due to its broad scope thanks to the participation of experts from several countries, projects, and initiatives. 
 
