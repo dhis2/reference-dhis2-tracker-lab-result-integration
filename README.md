@@ -4,13 +4,13 @@
 
 ## What is this implementation?
 
-DHIS2 Tracker programmes can be configured to support case-based disease surveillance and EMR functions such as patient health record. Often laboratory results need to be entered into such programmes to inform the decision-making of health professionals. In contrast to manual data entry, sending electronically the laboratory results to DHIS2 helps speed up this decision-making, eliminate manual transcribing errors between systems, as well as improve the information availability to all health and management staff. 
+DHIS2 Tracker programs can be configured to support case-based disease surveillance and EMR functions such as patient health record. Often laboratory results need to be entered into such programmes to inform the decision-making of health professionals. In contrast to manual data entry, sending electronically the laboratory results to DHIS2 helps speed up this decision-making, eliminate manual transcribing errors between systems, as well as improve the information availability to all health and management staff. 
 
-A Laboratory Information System (LIS) is typically the primary source of laboratory results destined to other information systems. With the generous support of US CDC, HISP Centre developed this reference implementation to demonstrate the electronic transmission of lab results from a LIS to DHIS2, improving the timeliness and quality of such results in Tracker programmes.
+A Laboratory Information System (LIS) is typically the primary source of laboratory results destined to other information systems. With the generous support of US CDC, HISP Centre developed this reference implementation to demonstrate the electronic transmission of lab results from a LIS to DHIS2, improving the timeliness and quality of such results in Tracker programs.
 
 As defined in [Laboratory Information Systems Project Management: A Guidebook for International Implementations](https://aphl.org/docs/default-source/technical/gh-2019may-lis-guidebook-web.pdf), a LIS is a _computer-based information management systems created specifically for laboratories, to support workflow, track data from the start to the end of the testing process, store data, and provide correct and complete information to laboratory staff, managers, and customers in a timely manner allowing for decision making by clinicians, epidemiologists and other stakeholders_.
 
-This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker programme used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming them into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
+This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker programme used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
 
 This is an example meant to technically guide you in developing your own integration between an LIS and DHIS2. It **SHOULD NOT** be used directly in production without adapting it to your local context.
 
@@ -49,7 +49,7 @@ What follows is a brief overview of the architectural components:
 
 ### DHIS2
 
-The role assigned to DHIS2 in this reference implementation is that of an [integrated surveillance and outbreak response system](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance is preconfigured with programs covering case surveillance and contract tracing. The lab result integration is focused on the case surveillance program which has its workflow depicted below:
+The role assigned to DHIS2 in this reference implementation is that of an [integrated surveillance and outbreak response system](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance is preconfigured with programs covering case surveillance and contact tracing. The lab result integration is focused on the case surveillance program which has its workflow depicted below:
 
 ![Case surveillance program](docs/case-surveillance-program.png)
 
@@ -87,9 +87,11 @@ The successive lab results represent corrections or amendments in the source lab
 
 ---
 
-As part of the lab result integration, DHIS2 drives the transformation and terminology mapping such that the lab result can be imported into DHIS2. In terms of FHIR-to-DHIS2 JSON transformation, the DHIS2 data store holds the [DataSonnet](https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html) script translating the FHIR resources into DHIS2 resources:
+As part of the lab result integration, DHIS2 drives the transformation and terminology mapping in the Interoperability Layer such that the lab result can be imported into DHIS2. In terms of FHIR-to-DHIS2 JSON transformation, the DHIS2 data store holds the [DataSonnet](https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html) script translating the FHIR resources into DHIS2 resources.
 
 ![FHIR-to-DHIS2 transform script](docs/datastore-transform-script.png)
+
+DataSonnet is a JSON-extended template that lends well to JSON-to-JSON transformations. 
 
 In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps either the LOINC code `LA11882-0` or `LA6576-8` to the option set value `POSITIVE`. 
 
@@ -107,31 +109,31 @@ The IG profiles several FHIR resources though the following are used in this pro
 
 * Specimen: holds the specimen ID and the date the specimen was received at the lab
 * Observation: contains the LOINC codes identifying the test carried out and its result
-* Patient: the test subject which can be anonymous so to safeguard patient data
+* Patient: the test subject which can be anonymous so as to safeguard patient data
 * DiagnosticReport: bundles together the specimen, observation, and patient resources while provides a status 
 
 ### Interoperability Layer
 
 The interoperability layer (IOL) is a low-code and customisable [Apache Camel](https://camel.apache.org/) background application running on the Java Virtual Machine (JVM) that bridges the LIS diagnostic report to the DHIS2 lab result program stage. Its operation is broadly broken down in the following steps:
 
-1. The application routinely fetches active enrollments in the program having the ID `N07iEegH3Hw` (i.e., case surveillance program) from DHIS2 with the subsequent HTTP call: `.../api/tracker/enrollments?program=N07iEegH3Hw&status=ACTIVE&fields=enrollment,events`.
+1. The application routinely fetches active enrollments from DHIS2 having program ID `N07iEegH3Hw` (i.e., case surveillance program) with the subsequent GET HTTP call: `.../api/tracker/enrollments?program=N07iEegH3Hw&status=ACTIVE&fields=enrollment,events`.
 
 2. If there are active cases, the IOL proceeds to:
 
    1. Fetch from DHIS2:
-      1. data element codes that have LOINC code attributes present using the HTTP call `.../api/dataElements?LqVVfNVy594:!null&fields=code,attributeValues`
-      2. option set value codes have LOINC code attributes present using the HTTP call `.../api/options?LqVVfNVy594:!null&fields=code,attributeValues`
-      3. the DataSonnet script from the data store using the HTTP call `.../api/dataStore/iol/diagnosticReportTransformScript`
+      1. data element codes that have LOINC code attributes present using the GET HTTP call `.../api/dataElements?LqVVfNVy594:!null&fields=code,attributeValues`
+      2. option set value codes have LOINC code attributes present using the GETT HTTP call `.../api/options?LqVVfNVy594:!null&fields=code,attributeValues`
+      3. the DataSonnet script from the data store using the GET HTTP call `.../api/dataStore/iol/diagnosticReportTransformScript`
 
-   2. Search for completed lab requests within the downloaded active cases such that the event program stage ID is equal to `N07iEegH3Hw` and the status is equal to `COMPLETED`. 
+   2. Search for completed lab requests within the fetched active cases such that the event program stage ID is equal to `N07iEegH3Hw` (i.e., the lab request program stage) and the status is equal to `COMPLETED`. 
 
-   3. Extract the specimen ID from each lab request and collect into a list any lab results matching the lab request specimen ID. 
+   3. For each lab request, extract its specimen ID and collect into a list any lab results found within the enrollment matching the specimen ID. It is assumed that if one or more lab results are found in the case, then a diagnostic report in the LIS for the lab request already exists.
 
-   4. Record the `createdAt` timestamp of the most recent lab result should there be one or more corresponding lab results. This timestamp allows the IOL to fetch the LIS diagnostic report after the `createdAt` of the most recent lab result.
+   4. Record the `createdAt` timestamp of the most recent lab result should there be one or more corresponding lab results for the give lab request. This timestamp enables the IOL to fetch the LIS diagnostic report which after the `createdAt` of the most recent lab result.
 
-   5. Fetch the diagnostic report from the LIS for a given lab request with the HTTP call `/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[lastLabResultCreatedAt]` where:
+   5. Search for _final_, _amended_, _appended_, or _corrected_ diagnostic reports by the lab request specimen ID in the LIS. A key constraint in the reference implementation is that the specimen ID is unique across laboratory orders so the IOL assumes that the LIS returns at most a single diagnostic report for a given specimen ID. The behaviour for multiple diagnostic reports in the search result is undefined. The GET HTTP call to search the reports is  `.../fhir/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[lastLabResultCreatedAt]` where:
       * `[specimenId]` is substituted with the lab request specimen ID, and 
-      * `[lastLabResultCreatedAt]` is substituted with the `createdAt` of the most recent lab result for `[specimenId]`. `[lastLabResultCreatedAt]` defaults to `0000-01-01` if no such lab result exists to indicate that the diagnostic report should be retrieved regardless
+      * `[lastLabResultCreatedAt]` is substituted with the `createdAt` of the most recent lab result for `[specimenId]`. The IOL defaults `[lastLabResultCreatedAt]` to `0000-01-01` if no lab results exist to indicate that the diagnostic report should be retrieved regardless of when its update occurred.  
 
    6. Transform the diagnostic report, if returned, into a DHIS2 event using the DataSonnet script fetched in step _2ia_ and where the LOINC codes are mapped into data element and option set value codes using mapping downloaded from step _2ib_ and _2ic_
 
