@@ -4,13 +4,13 @@
 
 ## What is this implementation?
 
-DHIS2 Tracker programs can be configured to support case-based disease surveillance and EMR functions such as patient health record. Often laboratory results need to be entered into such programmes to inform the decision-making of health professionals. In contrast to manual data entry, sending electronically the laboratory results to DHIS2 helps speed up this decision-making, eliminate manual transcribing errors between systems, as well as improve the information availability to all health and management staff. 
+DHIS2 Tracker programs can be configured to support case-based disease surveillance and EMR functions such as patient health record. Often laboratory results need to be entered into such programs to inform the decision-making of health professionals. In contrast to manual data entry, sending electronically the laboratory results to DHIS2 helps speed up this decision-making, eliminate manual transcribing errors between systems, as well as improve the information availability to all health and management staff. 
 
 A Laboratory Information System (LIS) is typically the primary source of laboratory results destined to other information systems. With the generous support of US CDC, HISP Centre developed this reference implementation to demonstrate the electronic transmission of lab results from a LIS to DHIS2, improving the timeliness and quality of such results in Tracker programs.
 
 As defined in [Laboratory Information Systems Project Management: A Guidebook for International Implementations](https://aphl.org/docs/default-source/technical/gh-2019may-lis-guidebook-web.pdf), a LIS is a _computer-based information management systems created specifically for laboratories, to support workflow, track data from the start to the end of the testing process, store data, and provide correct and complete information to laboratory staff, managers, and customers in a timely manner allowing for decision making by clinicians, epidemiologists and other stakeholders_.
 
-This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker programme used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
+This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker program used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven interoperability layer component which also bridges the structural and semantic differences between FHIR and DHIS2.
 
 This is an example meant to technically guide you in developing your own integration between an LIS and DHIS2. It **SHOULD NOT** be used directly in production without adapting it to your local context.
 
@@ -57,7 +57,7 @@ The following sections drill down into the stages that are relevant to the lab r
 
 #### Enrollment Stage
 
-A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enroll the person into the programme. In the enrollment form shown below, the initial diagnosis can be either cholera, ebola, or mpox.
+A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enroll the person into the program. In the enrollment form shown below, the initial diagnosis can be either cholera, ebola, or mpox.
 
 ![Enrollment form](docs/enrollment-form.png)
 
@@ -101,7 +101,7 @@ The DHIS2 implementer benefits from having the transformation of the lab result 
 
 ### Lab Information System
 
-The LIS is the source of the lab results in the DHIS2 case surveillance programme. In the real world, one or more laboratory analysers would run tests on the specimen and then report their results to the LIS for storage and analysis. However, in this reference implementation, a script runner is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the Interoperability Layer as described in the next section.
+The LIS is the source of the lab results in the DHIS2 case surveillance program. In the real world, one or more laboratory analysers would run tests on the specimen and then report their results to the LIS for storage and analysis. However, in this reference implementation, a script runner is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the Interoperability Layer as described in the next section.
 
 HAPI FHIR is the server powering the mock LIS. FHIR (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface. HAPI FHIR is a popular open-source server implementation of FHIR and is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). At the time of writing, the guide is still in draft stage, nevertheless, it was selected to represent the lab result communication due to its broad scope thanks to the participation of experts from several countries, projects, and initiatives. 
 
