@@ -31,8 +31,8 @@
 - route:
     id: processLabRequestRoute
     description: |
-      Searches for the last lab result DHIS2 event and any matching diagnostic result the LIS before sending the message to be imported 
-      into DHIS2.
+      Searches for the last lab result DHIS2 event and any matching diagnostic result in the LIS prior to sending the
+      message to be final stage of processing.
     from:
       uri: direct:processLabRequest
       steps:

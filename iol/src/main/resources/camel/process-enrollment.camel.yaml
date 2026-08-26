@@ -31,7 +31,7 @@
 - route:
     id: processEnrollmentRoute
     description: |
-      Pulls out completed lab request events from the enrollment before sending the events downstream for further.
+      Pulls out completed lab request events from the enrollment before sending the events downstream for further
       processing.
     from:
       uri: direct:processEnrollment

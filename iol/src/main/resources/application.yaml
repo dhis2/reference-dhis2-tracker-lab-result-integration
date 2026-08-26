@@ -68,7 +68,7 @@ logging:
   level:
     root: INFO
 
-main:
+run:
   interval: "*/5 * * * * ?"
 
 dhis2:

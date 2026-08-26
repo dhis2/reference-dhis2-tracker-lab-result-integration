@@ -33,9 +33,9 @@
     description: |
       Kicks off the routine scan of active enrollments.
     from:
-      uri: "quartz:poll"
+      uri: "quartz:scanEnrollments"
       parameters:
-        cron: "*/5 * * * * ?"
+        cron: "{{run.interval}}"
         stateful: true
       steps:
         - setHeader:
@@ -45,7 +45,7 @@
             groovy: "['program': '{{dhis2.program.id}}', 'status': 'ACTIVE']"
         - to:
             description: |
-              Fetches the enrollments from DHIS2 Tracker.
+              Fetches the enrollments from DHIS2 Tracker given the `CamelDhis2.queryParams` header as search filter.
             uri: dhis2:get/collection
             parameters:
               path: tracker/enrollments
@@ -73,7 +73,8 @@
             uri: direct:getOptionCodeDict
             variableReceive: optionCodeDict
         - split:
-            description: Iterate over each enrollment.
+            description: |
+              Iterate over the enrollments.
             simple: ${body}
             steps:
               - to: direct:processEnrollment
