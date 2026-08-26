@@ -30,22 +30,30 @@
 
 - route:
     id: processLabRequestRoute
+    description: |
+      Searches for the last lab result DHIS2 event and any matching diagnostic result the LIS before sending the message to be imported 
+      into DHIS2.
     from:
       uri: direct:processLabRequest
       steps:
         - setVariable:
+            description: Stashes the specimen ID from the lab request event.
             name: specimenId
             groovy: |
               body.dataValues.get().find {
                   it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}'
               }?.value?.get()
         - filter:
+            description: |
+              Drops processing of this lab request if the specimen ID data element was empty (should not happen).
             groovy: |
               variables.specimenId != null
         - setVariable:
             name: labRequestEvent
             groovy: body
         - setVariable:
+            description: |
+              Stashes the last lab result event for the given lab request or null if such an event does not exist.
             name: lastLabResultEvent
             groovy: |
               variables.events.findAll {
@@ -53,7 +61,16 @@
                       it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}' && it.value.get() == variables.specimenId
                   } != null)
               }.sort { it.createdAt }.with { isEmpty() ? null : last() }
-        - to: direct:fetchDiagnosticReport
+        - to:
+            description: |
+              Retrieves the diagnostic report FHIR resource from the LIS.
+            uri: direct:fetchDiagnosticReport
         - filter:
+            description: |
+              Drops processing of this lab request if no results were returned by the LIS. This could mean that the LIS
+              has not yet received the lab report from the lab analyser.
             simple: ${body.entry.size()} > 1
-        - to: direct:importLabResult
+        - to:
+            description: |
+              Send the LIS diagnostic report to the final stage of processing.
+            uri: direct:importLabResult

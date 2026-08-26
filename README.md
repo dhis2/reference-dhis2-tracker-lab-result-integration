@@ -49,7 +49,7 @@ What follows is a brief overview of the architectural components:
 
 ### DHIS2
 
-The role assigned to DHIS2 in this reference implementation is that of an [integrated surveillance and outbreak response system](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance is preconfigured with programs covering case surveillance and contact tracing. The lab result integration is focused on the case surveillance program which has its workflow depicted below:
+The role assigned to DHIS2 in this reference implementation is that of an [integrated surveillance and outbreak response system](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance is preconfigured with programs covering case surveillance and contact tracing. The laboratory result integration is focused on the case surveillance program which has its workflow depicted below:
 
 ![Case surveillance program](docs/case-surveillance-program.png)
 
@@ -69,11 +69,11 @@ The lab request stage is used for reporting the laboratory order and to link the
 
 The specimen ID field shown above is mandatory and is expected to be unique for each lab request, even across cases. In other settings, instead of the specimen ID, alternative or additional unique linking identifiers could be required such as the patient name or the case ID, each with their own tradeoffs.
 
-Completing the lab request form does not trigger a laboratory order. It is assumed that the laboratory test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a test kit that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding laboratory lab reports, and pushes the reports to the LIS.
+Completing the lab request form does not trigger a laboratory order. It is assumed that the laboratory test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a test kit that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding laboratory reports, and pushes the reports to the LIS.
 
 #### Lab Result Stage
 
-Following the lab request is the lab result program stage. This is the stage that has its form auto-populated with the results from the LIS through the IOL as described in the next section. Without human intervention, a lab result is imported into the ongoing case when a laboratory report that has a specimen ID linking it to the lab request in DHIS2 becomes available in the LIS. The outcome is a completed lab result data entry form like the following:
+After the lab request is the lab result program stage. This is the stage that has its form auto-populated with the results from the LIS through the IOL as described in the [Interoperability Layer](#interoperability-layer) section. Without human intervention, a lab result is imported into the ongoing case when a laboratory report that has a specimen ID linking it to the lab request in DHIS2 becomes available in the LIS. The outcome is a completed lab result data entry form, like the following, for the surveillance officer to review:
 
 ![Lab result form](docs/lab-result-form.png)
 

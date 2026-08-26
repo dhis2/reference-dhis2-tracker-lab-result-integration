@@ -29,9 +29,9 @@
 #
 
 - route:
-    id: getMappingScriptRoute
+    id: getTransformScriptRoute
     from:
-      uri: direct:getMappingScript
+      uri: direct:getTransformScript
       steps:
         - to:
             description: Fetches the DataSonnet expression from the DHIS2 server's data store.

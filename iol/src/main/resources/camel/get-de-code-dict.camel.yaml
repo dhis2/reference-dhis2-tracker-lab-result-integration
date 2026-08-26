@@ -30,10 +30,14 @@
 
 - route:
     id: getDataElementCodeDictRoute
+    description: |
+      Builds a mapping between the LOINC codes and the DHIS2 data element codes.
     from:
       uri: direct:getDataElementCodeDict
       steps:
         - to:
+            description: |
+              Fetches all data elements from DHIS2 that have a LOINC code present.
             uri: dhis2:get/collection
             parameters:
               path: dataElements
@@ -42,6 +46,8 @@
               fields: code,attributeValues
               client: "#dhis2Client"
         - transform:
+            description: |
+              Builds a list of key-value pairs where the key is the LOINC code and the value is the DHIS2 data element code.
             groovy: |
               body.collectEntries {
                   de -> [(de.attributeValues.find {

@@ -30,6 +30,8 @@
 
 - route:
     id: mainRoute
+    description: |
+      Kicks off the routine scan of active enrollments.
     from:
       uri: "quartz:poll"
       parameters:
@@ -37,10 +39,13 @@
         stateful: true
       steps:
         - setHeader:
+            description: |
+              Sets the search Tracker program ID and enrollment status query parameters for the outgoing HTTP request to DHIS2.
             name: CamelDhis2.queryParams
             groovy: "['program': '{{dhis2.program.id}}', 'status': 'ACTIVE']"
         - to:
-            description: Fetches the tracked entity from the DHIS2 server.
+            description: |
+              Fetches the enrollments from DHIS2 Tracker.
             uri: dhis2:get/collection
             parameters:
               path: tracker/enrollments
@@ -49,17 +54,26 @@
               paging: true
               client: "#dhis2Client"
         - filter:
+            description: |
+              Continue processing only if there is at least a single enrollment in the results.
             simple: ${body.hasNext}
         - to:
-            uri: direct:getMappingScript
+            description: |
+              Stashes the script for transforming FHIR resources into DHIS2 events.
+            uri: direct:getTransformScript
             variableReceive: diagnosticReportTransformScript
         - to:
+            description: |
+              Stashes the dictionary mapping LOINC codes to data element codes.
             uri: direct:getDataElementCodeDict
             variableReceive: dataElementCodeDict
         - to:
+            description: |
+              Stashes the dictionary mapping LOINC codes to option set value codes.
             uri: direct:getOptionCodeDict
             variableReceive: optionCodeDict
         - split:
+            description: Iterate over each enrollment.
             simple: ${body}
             steps:
               - to: direct:processEnrollment

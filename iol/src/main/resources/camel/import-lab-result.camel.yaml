@@ -30,17 +30,28 @@
 
 - route:
     id: importLabResultRoute
+    description: |
+      Imports lhe lab result in DHIS2.
     from:
       uri: direct:importLabResult
       steps:
         - marshal:
+            description: |
+              Turns the FHIR resource into a raw JSON string.
             fhirJson: {}
         - unmarshal:
+            description: |
+              Deserialises the JSON string into a `java.util.Map` so that it can be referenced from the DataSonnet script.
             json: {}
         - convertVariableTo:
+            description: |
+              Turns the complex object into a `java.util.Map` so that it can be referenced from the DataSonnet script.
             name: labRequestEvent
             type: java.util.Map
         - transform:
+            description: |
+              Dynamically loads the DataSonnet script retrieved from the DHIS2 data store and applies it to the message 
+              to convert the FHIR resources into a DHIS2 Tracker event.
             groovy: |
               camelContext.resolveLanguage('datasonnet').createExpression(variables.get('diagnosticReportTransformScript')).with {
                 outputMediaType = new com.datasonnet.document.MediaType('application', 'json')
@@ -49,10 +60,13 @@
                 evaluate(exchange, String)
               }
         - setHeader:
+            description: |
+              Sets the query parameter for the outgoing HTTP request to DHIS2.
             name: CamelDhis2.queryParams
             groovy: "['dataElementIdScheme': 'CODE']"
         - to:
-            description: Updates the lab result program stage in DHIS2.
+            description: |
+              Imports synchronously a lab result event into DHIS2.
             uri: dhis2:post/resource
             parameters:
               path: tracker?async=false
@@ -61,6 +75,8 @@
             json:
               unmarshalType: org.hisp.dhis.api.model.v42_4.TrackerImportReport
         - choice:
+            description: |
+              Evaluates the outcome of the DHIS2 import operation.
             when:
               - simple: "${body.status} == 'OK'"
                 steps:

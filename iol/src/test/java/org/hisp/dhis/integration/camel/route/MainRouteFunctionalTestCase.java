@@ -63,14 +63,12 @@ import org.hisp.dhis.api.model.v42_4.TrackerTrackedEntity;
 import org.hisp.dhis.integration.camel.AbstractFunctionalTestCase;
 import org.hisp.dhis.integration.sdk.api.Dhis2Client;
 import org.hl7.fhir.r4.model.Bundle;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 @UseAdviceWith
-public class ImportLabResultsRouteFunctionalTestCase extends AbstractFunctionalTestCase {
+public class MainRouteFunctionalTestCase extends AbstractFunctionalTestCase {
     @Autowired
     private CamelContext camelContext;
 

@@ -30,13 +30,19 @@
 
 - route:
     id: fetchDiagnosticReportRoute
+    description: |
+      Fetches the diagnostic report from the FHIR server.
     from:
       uri: direct:fetchDiagnosticReport
       steps:
         - setHeader:
+            description: |
+              Sets the URL path for the request to send to the FHIR server.
             name: CamelFhir.url
             simple: "/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=${variables.specimenId}&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt${variables.lastLabResultEvent.createdAt} ?: '0000-01-01'"
         - to:
+            description: |
+              Searches the FHIR server using the query set in the `CamelFhir.url` header.
             id: searchDiagnosticReport
             uri: fhir://search/searchByUrl
             parameters:
