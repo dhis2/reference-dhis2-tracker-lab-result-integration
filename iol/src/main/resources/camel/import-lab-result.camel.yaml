@@ -45,9 +45,15 @@
             json: {}
         - convertVariableTo:
             description: |
-              Turns the complex object into a `java.util.Map` so that it can be referenced from the DataSonnet script.
+              Turns the lab request POJO into a `java.util.Map` so that it can be referenced from the DataSonnet script.
             name: labRequestEvent
             type: java.util.Map
+        - convertVariableTo:
+            description: |
+              Turns the lab result POJO, if it exists, into a `java.util.Map` so that it can be referenced from the DataSonnet script.
+            name: labResultEvent
+            type: java.util.Map
+            mandatory: false
         - transform:
             description: |
               Dynamically loads the DataSonnet script retrieved from the DHIS2 data store and applies it to the message 
@@ -63,7 +69,7 @@
             description: |
               Sets the query parameter for the outgoing HTTP request to DHIS2.
             name: CamelDhis2.queryParams
-            groovy: "['dataElementIdScheme': 'CODE']"
+            groovy: "['dataElementIdScheme': 'CODE', 'importStrategy': 'CREATE_AND_UPDATE']"
         - to:
             description: |
               Imports synchronously a lab result event into DHIS2.
@@ -71,6 +77,9 @@
             parameters:
               path: tracker?async=false
               client: "#dhis2Client"
+        - log:
+            message: "!!!!!!!! => ${body}"
+            loggingLevel: ERROR
         - unmarshal:
             json:
               unmarshalType: org.hisp.dhis.api.model.v42_4.TrackerImportReport

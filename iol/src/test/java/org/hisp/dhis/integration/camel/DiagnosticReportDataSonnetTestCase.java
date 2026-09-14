@@ -88,8 +88,8 @@ public class DiagnosticReportDataSonnetTestCase {
         exchange.setVariable("specimenId", "Foo");
         exchange.setVariable("enrollmentId", "Foo");
         exchange.setVariable("labRequestEvent", Map.of("program", "Foo", "orgUnit", "Foo"));
-        exchange.setVariable("dataElementCodeDict", Map.of("75411-9", "CS_LAB_RT_PCR"));
-        exchange.setVariable("optionCodeDict", Map.of("LA11882-0", "POSITIVE"));
+        exchange.setVariable("dataElementCodeDict", Map.of("75411-9", "CS_LAB_RT_PCR", "71768-6", "CS_LAB_ANTIGEN_DETECTION",  "71770-2", "CS_LAB_IGG_SEROLOGY", "41637-0", "CS_LAB_IMMUNOFLUORESCENCE"));
+        exchange.setVariable("optionCodeDict", Map.of("LA11882-0", "POSITIVE", "LA6576-8", "POSITIVE"));
 
         Map<String, Object> dhis2Events = new ValueBuilder(dsExpression).evaluate(exchange, Map.class);
         Map<String, Object> expectedDhis2Events =

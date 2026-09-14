@@ -1,12 +1,18 @@
 {
   "events": [
     {
+      "updatedAt": "2026-09-10T16:55:46.211+00:00",
       "orgUnit": "Foo",
-      "occurredAt": "2023-03-27",
+      "occurredAt": "2026-09-10",
       "status": "COMPLETED",
       "program": "Foo",
       "programStage": "mDvE6kdNpty",
       "enrollment": "Foo",
+      "notes": [
+        {
+          "value": "final"
+        }
+      ],
       "dataValues": [
         {
           "dataElement": "CS_SPECIMEN_ID",
@@ -14,10 +20,38 @@
         },
         {
           "dataElement": "CS_DATE_SPECIMEN_RECEIVED_AT_LAB",
-          "value": "2026-07-26"
+          "value": "2026-09-09"
+        },
+        {
+          "dataElement": "CS_LAB_IGG_SEROLOGY",
+          "value": "POSITIVE"
+        },
+        {
+          "dataElement": "CS_LAB_IMMUNOFLUORESCENCE",
+          "value": "POSITIVE"
         },
         {
           "dataElement": "CS_LAB_RT_PCR",
+          "value": "POSITIVE"
+        },
+        {
+          "dataElement": "CS_LAB_ANTIGEN_DETECTION",
+          "value": "POSITIVE"
+        },
+        {
+          "dataElement": "CS_LAB_IGG_SEROLOGY",
+          "value": "POSITIVE"
+        },
+        {
+          "dataElement": "CS_LAB_IMMUNOFLUORESCENCE",
+          "value": "POSITIVE"
+        },
+        {
+          "dataElement": "CS_LAB_RT_PCR",
+          "value": "POSITIVE"
+        },
+        {
+          "dataElement": "CS_LAB_ANTIGEN_DETECTION",
           "value": "POSITIVE"
         }
       ]

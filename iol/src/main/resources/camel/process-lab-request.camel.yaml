@@ -31,7 +31,7 @@
 - route:
     id: processLabRequestRoute
     description: |
-      Searches for the last lab result DHIS2 event and any matching diagnostic result in the LIS prior to sending the
+      Searches for a corresponding lab result DHIS2 event and any matching diagnostic result in the LIS prior to sending the
       message to be final stage of processing.
     from:
       uri: direct:processLabRequest
@@ -49,18 +49,20 @@
             groovy: |
               variables.specimenId != null
         - setVariable:
+            description: |
+              Stashes the current lab request event being processed.
             name: labRequestEvent
             groovy: body
         - setVariable:
             description: |
-              Stashes the last lab result event for the given lab request or null if such an event does not exist.
-            name: lastLabResultEvent
+              Stashes the corresponding lab result event for the given lab request or null if such an event does not exist.
+            name: labResultEvent
             groovy: |
               variables.events.findAll {
                   it.programStage.get() == '{{dhis2.program.labResultProgramStage.id}}' && (it.dataValues.get().find {
                       it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}' && it.value.get() == variables.specimenId
                   } != null)
-              }.sort { it.createdAt }.with { isEmpty() ? null : last() }
+              }.with { isEmpty() ? null : last() }
         - to:
             description: |
               Retrieves the diagnostic report FHIR resource from the LIS.
