@@ -73,12 +73,12 @@ run:
 
 dhis2:
   loincCodesAttribute:
-    id: LqVVfNVy594
+    id: LSOp4QUOK2m
   program:
     id: N07iEegH3Hw
     specimenDataElement:
       id: TS6Yt0weEhi
     labRequestProgramStage:
       id: d62zsvlENzr
-    labResultProgramStage:
+    labReportProgramStage:
       id: mDvE6kdNpty

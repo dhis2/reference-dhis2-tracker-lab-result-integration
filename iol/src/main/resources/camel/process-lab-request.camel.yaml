@@ -31,7 +31,7 @@
 - route:
     id: processLabRequestRoute
     description: |
-      Searches for a corresponding lab result DHIS2 event and any matching diagnostic result in the LIS prior to sending the
+      Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the
       message to be final stage of processing.
     from:
       uri: direct:processLabRequest
@@ -55,11 +55,12 @@
             groovy: body
         - setVariable:
             description: |
-              Stashes the corresponding lab result event for the given lab request or null if such an event does not exist.
-            name: labResultEvent
+              Stashes the corresponding lab report event for the given lab request or null if such an event does not exist.
+              There should be one and only one lab report event for a given specimen ID.
+            name: labReportEvent
             groovy: |
               variables.events.findAll {
-                  it.programStage.get() == '{{dhis2.program.labResultProgramStage.id}}' && (it.dataValues.get().find {
+                  it.programStage.get() == '{{dhis2.program.labReportProgramStage.id}}' && (it.dataValues.get().find {
                       it.dataElement.get() == '{{dhis2.program.specimenDataElement.id}}' && it.value.get() == variables.specimenId
                   } != null)
               }.with { isEmpty() ? null : last() }
@@ -75,4 +76,4 @@
         - to:
             description: |
               Send the LIS diagnostic report to the final stage of processing.
-            uri: direct:importLabResult
+            uri: direct:importLabReport

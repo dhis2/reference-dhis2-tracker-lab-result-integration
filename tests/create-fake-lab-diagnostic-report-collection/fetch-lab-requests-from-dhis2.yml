@@ -91,10 +91,12 @@ runtime:
         }
 
         async function ebola() {
-           bru.setVar("75411-9", ["LA11883-8", "LA11882-0"][Math.floor(Math.random() * 2)]);
-           bru.setVar("71768-6", ["LA6576-8", "LA6577-6"][Math.floor(Math.random() * 2)]);
-           bru.setVar("71770-2", ["LA6576-8", "LA6577-6"][Math.floor(Math.random() * 2)]);
-           bru.setVar("41637-0", ["LA6576-8", "LA6577-6"][Math.floor(Math.random() * 2)]);
+           bru.setVar("CS_EBOLA_NAAT_ASSAY_TARGET", ["88186-2", "41636-2", "75411-9", "101406-7", "41638-8"][Math.floor(Math.random() * 5)]);
+           bru.setVar("CS_LAB_RT_PCR", ["LA11882-0", "LA11883-8", "LA9663-1", "LA13548-5"][Math.floor(Math.random() * 4)]);
+           bru.setVar("CS_EBOLA_ORTHOEBOLAVIRUS_SPECIES", ["EBOLA_SP_ZAIRENSE", "EBOLA_SP_SUDANENSE", "EBOLA_SP_BUNDIBUGYOENSE", "EBOLA_SP_TAIENSE", "EBOLA_SP_RESTONENSE", "EBOLA_SP_NOT_DETERMINED", "EBOLA_SP_NONE_DETECTED"][Math.floor(Math.random() * 7)]);
+           bru.setVar("71768-6", ["LA6576-8", "LA6577-6", "LA15841-2", "LA11885-3"][Math.floor(Math.random() * 4)]);
+           bru.setVar("71712-4", ["LA6576-8", "LA6577-6", "LA15841-2", "LA11885-3"][Math.floor(Math.random() * 4)]);
+           bru.setVar("71770-2", ["LA6576-8", "LA6577-6", "LA15841-2", "LA11885-3"][Math.floor(Math.random() * 4)]);
 
            await bru.runRequest("create-lis-ebola-diagnostic-report");
         }

@@ -81,8 +81,8 @@ public class MainRouteFunctionalTestCase extends AbstractFunctionalTestCase {
     @Value("${dhis2.program.labRequestProgramStage.id}")
     private String dhis2LabRequestProgramStageId;
 
-    @Value("${dhis2.program.labResultProgramStage.id}")
-    private String dhis2LabResultProgramStageId;
+    @Value("${dhis2.program.labReportProgramStage.id}")
+    private String dhis2LabReportProgramStageId;
 
     @Value("${dhis2.program.specimenDataElement.id}")
     private String dhis2SpecimenDataElementId;
@@ -121,7 +121,7 @@ public class MainRouteFunctionalTestCase extends AbstractFunctionalTestCase {
 
         AdviceWith.adviceWith(
                 camelContext,
-                "importLabResultRoute",
+                "importLabReportRoute",
                 r -> r.weaveAddLast().to("mock:spy"));
         MockEndpoint spyEndpoint = camelContext.getEndpoint("mock:spy", MockEndpoint.class);
         spyEndpoint.setResultWaitTime(120000);
@@ -173,18 +173,18 @@ public class MainRouteFunctionalTestCase extends AbstractFunctionalTestCase {
 
         spyEndpoint.assertIsSatisfied();
 
-        List<EventsRefRef> labResultEvents = Lists.newArrayList(dhis2Client
+        List<EventsRefRef> labReportEvents = Lists.newArrayList(dhis2Client
                 .get("tracker/events")
                 .withField("*").withoutPaging()
                 .withParameter("program", dhis2ProgramId)
                 .withParameter("status", EventsRefRef.EventStatus.COMPLETED.value())
-                .withParameter("programStage", dhis2LabResultProgramStageId)
+                .withParameter("programStage", dhis2LabReportProgramStageId)
                 .withParameter("trackedEntity", trackedEntityId)
                 .transfer().returnAs(EventsRefRef.class, "events"));
 
-        assertEquals(1, labResultEvents.size());
-        assertEquals(dhis2SpecimenDataElementId, labResultEvents.get(0).getDataValues().get().get(0).getDataElement().get());
-        assertEquals(specimenIdUnderTest, labResultEvents.get(0).getDataValues().get().get(0).getValue().get());
+        assertEquals(1, labReportEvents.size());
+        TrackerDataValue trackerDataValue = labReportEvents.get(0).getDataValues().get().stream().filter(dv -> dv.getDataElement().get().equals(dhis2SpecimenDataElementId)).findFirst().get();
+        assertEquals(specimenIdUnderTest, trackerDataValue.getValue().get());
     }
 
     public List<TrackerEnrollment> enrol(String orgUnitId, String specimenId) {

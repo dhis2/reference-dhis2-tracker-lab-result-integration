@@ -1,9 +1,9 @@
 {
   "events": [
     {
-      "updatedAt": "2026-09-10T16:55:46.211+00:00",
+      "updatedAt": "2026-09-18T06:00:51.691+00:00",
       "orgUnit": "Foo",
-      "occurredAt": "2026-09-10",
+      "occurredAt": "2026-09-18",
       "status": "COMPLETED",
       "program": "Foo",
       "programStage": "mDvE6kdNpty",
@@ -20,39 +20,31 @@
         },
         {
           "dataElement": "CS_DATE_SPECIMEN_RECEIVED_AT_LAB",
-          "value": "2026-09-09"
+          "value": "2026-09-17"
         },
         {
-          "dataElement": "CS_LAB_IGG_SEROLOGY",
-          "value": "POSITIVE"
-        },
-        {
-          "dataElement": "CS_LAB_IMMUNOFLUORESCENCE",
-          "value": "POSITIVE"
+          "dataElement": "CS_EBOLA_NAAT_ASSAY_TARGET",
+          "value": "75411-9"
         },
         {
           "dataElement": "CS_LAB_RT_PCR",
-          "value": "POSITIVE"
+          "value": "LAB_MOL_SPECIMEN_UNSATISFACTORY"
+        },
+        {
+          "dataElement": "CS_EBOLA_ORTHOEBOLAVIRUS_SPECIES",
+          "value": "EBOLA_SP_TAIENSE"
         },
         {
           "dataElement": "CS_LAB_ANTIGEN_DETECTION",
-          "value": "POSITIVE"
+          "value": "LAB_AG_NEGATIVE"
+        },
+        {
+          "dataElement": "CS_LAB_IGM_SEROLOGY",
+          "value": "LAB_SERO_EQUIVOCAL"
         },
         {
           "dataElement": "CS_LAB_IGG_SEROLOGY",
-          "value": "POSITIVE"
-        },
-        {
-          "dataElement": "CS_LAB_IMMUNOFLUORESCENCE",
-          "value": "POSITIVE"
-        },
-        {
-          "dataElement": "CS_LAB_RT_PCR",
-          "value": "POSITIVE"
-        },
-        {
-          "dataElement": "CS_LAB_ANTIGEN_DETECTION",
-          "value": "POSITIVE"
+          "value": "LAB_AG_POSITIVE"
         }
       ]
     }

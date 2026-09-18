@@ -29,11 +29,11 @@
 #
 
 - route:
-    id: importLabResultRoute
+    id: importLabReportRoute
     description: |
       Imports lhe lab result in DHIS2.
     from:
-      uri: direct:importLabResult
+      uri: direct:importLabReport
       steps:
         - marshal:
             description: |
@@ -51,7 +51,7 @@
         - convertVariableTo:
             description: |
               Turns the lab result POJO, if it exists, into a `java.util.Map` so that it can be referenced from the DataSonnet script.
-            name: labResultEvent
+            name: labReportEvent
             type: java.util.Map
             mandatory: false
         - transform:
@@ -77,9 +77,6 @@
             parameters:
               path: tracker?async=false
               client: "#dhis2Client"
-        - log:
-            message: "!!!!!!!! => ${body}"
-            loggingLevel: ERROR
         - unmarshal:
             json:
               unmarshalType: org.hisp.dhis.api.model.v42_4.TrackerImportReport
