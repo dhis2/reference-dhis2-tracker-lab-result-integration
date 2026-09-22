@@ -31,7 +31,7 @@
 - route:
     id: importLabReportRoute
     description: |
-      Imports lhe lab result in DHIS2.
+        Imports lhe lab report into DHIS2.
     from:
       uri: direct:importLabReport
       steps:

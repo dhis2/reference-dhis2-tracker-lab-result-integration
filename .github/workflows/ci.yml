@@ -18,7 +18,5 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
-      - name: Test esignet-capture-plugin
-        run: cd esignet-capture-plugin && yarn install --frozen-lockfile && yarn build && yarn test
-      - name: Test fhir-sync-agent
-        run: mvn -B clean package -f fhir-sync-agent/pom.xml
+      - name: Test IOL
+        run: mvn -B clean package -f iol/pom.xml

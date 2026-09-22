@@ -45,6 +45,10 @@
         {
           "dataElement": "CS_LAB_IGG_SEROLOGY",
           "value": "LAB_AG_POSITIVE"
+        },
+        {
+          "dataElement": "CS_EBOLA_SEQUENCING_OUTCOME",
+          "value": "LAB_SEQ_COMPLETE_GENOME"
         }
       ]
     }

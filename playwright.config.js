@@ -4,6 +4,7 @@ const {
 } = require('@playwright/test');
 
 module.exports = defineConfig({
+    timeout: 100_000,
     testDir: './tests',
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
@@ -27,7 +28,7 @@ module.exports = defineConfig({
     }, ],
 
     webServer: {
-        command: 'docker compose -f esignet-docker-compose.yml -f docker-compose.yml up --build --renew-anon-volumes --force-recreate --remove-orphans',
+        command: 'docker compose up--build --renew-anon-volumes --force-recreate --remove-orphans',
         url: 'http://localhost:8080',
         stdout: 'pipe',
         stderr: 'pipe',

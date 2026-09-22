@@ -1,7 +1,7 @@
 info:
   name: Fetch lab requests from DHIS2
   type: http
-  seq: 2
+  seq: 1
 
 http:
   method: GET
@@ -46,7 +46,7 @@ runtime:
            .filter(
                (dv) =>
                dv.dataElement === bru.getCollectionVar("specimen_data_element_id"),
-           ),
+           )
         );
 
         const resultSpecimen = res.body.enrollments.flatMap((et) =>
@@ -77,15 +77,15 @@ runtime:
                .map((attr) => attr.value);
            if (initialDiagnosis.length) {
                var dataValue = dv.value;
-               bru.setVar("specimen_accession_identifier", dataValue);
                if (
                    !savedSpecimenIds.includes(dataValue) &&
                    !resultSpecimen.find((r) => r.value === dataValue)
                ) {
                    if (initialDiagnosis[0] === "EBOLA") {
-                       ebola();
+                      bru.setVar("specimen_accession_identifier", dataValue);
+                      await ebola();
+                      savedSpecimenIds.push(dataValue);
                    }
-                   savedSpecimenIds.push(dataValue);
                }
            }
         }
@@ -97,9 +97,14 @@ runtime:
            bru.setVar("71768-6", ["LA6576-8", "LA6577-6", "LA15841-2", "LA11885-3"][Math.floor(Math.random() * 4)]);
            bru.setVar("71712-4", ["LA6576-8", "LA6577-6", "LA15841-2", "LA11885-3"][Math.floor(Math.random() * 4)]);
            bru.setVar("71770-2", ["LA6576-8", "LA6577-6", "LA15841-2", "LA11885-3"][Math.floor(Math.random() * 4)]);
+           bru.setVar("CS_EBOLA_SEQUENCING_OUTCOME", ["LAB_SEQ_COMPLETE_GENOME", "LAB_SEQ_PARTIAL_GENOME", "LAB_SEQ_FAILED"][Math.floor(Math.random() * 3)]);
 
-           await bru.runRequest("create-lis-ebola-diagnostic-report");
+           const response = await bru.runRequest("create-lis-ebola-diagnostic-report");
+           if (response.status !== 200) {
+              console.error("Diagnostic report in LIS could not be created", response.statusText);
+           }
         }
+
 
 settings:
   encodeUrl: true

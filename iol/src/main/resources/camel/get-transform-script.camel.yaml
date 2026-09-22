@@ -30,6 +30,9 @@
 
 - route:
     id: getTransformScriptRoute
+    description: |
+      Fetches the DataSonnet transformation script from the DHIS2 data store that transforms the FHIR resources to DHIS2 
+      resources.
     from:
       uri: direct:getTransformScript
       steps:
