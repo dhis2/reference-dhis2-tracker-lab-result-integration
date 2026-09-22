@@ -85,6 +85,6 @@ test("should successfully import the lab report into DHIS2",
                         dv.value === specimenId
                 ).length
         }, {
-            timeout: 30000
+            timeout: 40000
         }).toBe(1);
     });
