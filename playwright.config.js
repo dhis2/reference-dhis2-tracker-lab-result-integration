@@ -28,7 +28,7 @@ module.exports = defineConfig({
     }, ],
 
     webServer: {
-        command: 'docker compose up--build --renew-anon-volumes --force-recreate --remove-orphans',
+        command: 'docker compose up --wait --build --renew-anon-volumes --force-recreate --remove-orphans',
         url: 'http://localhost:8080',
         stdout: 'pipe',
         stderr: 'pipe',

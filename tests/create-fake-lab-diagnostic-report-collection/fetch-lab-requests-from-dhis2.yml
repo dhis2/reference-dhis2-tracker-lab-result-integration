@@ -81,11 +81,19 @@ runtime:
                    !savedSpecimenIds.includes(dataValue) &&
                    !resultSpecimen.find((r) => r.value === dataValue)
                ) {
+                   bru.setVar("specimen_accession_identifier", dataValue);
+                   var response;
                    if (initialDiagnosis[0] === "EBOLA") {
-                      bru.setVar("specimen_accession_identifier", dataValue);
-                      await ebola();
-                      savedSpecimenIds.push(dataValue);
+                      response = await ebola();
+                   } else if (initialDiagnosis[0] === "MPOX") {
+                      response = await mpox();
+                   } else if (initialDiagnosis[0] === "CHOLERA") {
+                      response = await cholera();
                    }
+                   if (response.status !== 200) {
+                      console.error("Diagnostic report in LIS could not be created", JSON.stringify(response));
+                   }
+                   savedSpecimenIds.push(dataValue);
                }
            }
         }
@@ -99,12 +107,44 @@ runtime:
            bru.setVar("71770-2", ["LA6576-8", "LA6577-6", "LA15841-2", "LA11885-3"][Math.floor(Math.random() * 4)]);
            bru.setVar("CS_EBOLA_SEQUENCING_OUTCOME", ["LAB_SEQ_COMPLETE_GENOME", "LAB_SEQ_PARTIAL_GENOME", "LAB_SEQ_FAILED"][Math.floor(Math.random() * 3)]);
 
-           const response = await bru.runRequest("create-lis-ebola-diagnostic-report");
-           if (response.status !== 200) {
-              console.error("Diagnostic report in LIS could not be created", response.statusText);
-           }
+           return await bru.runRequest("create-lis-ebola-diagnostic-report");
         }
 
+        async function mpox() {
+           const csMpoxMpxvClade = ["LA34860-9", "LA33581-2", "LA34861-7", "LA34862-5", "LA34863-3", "LA33582-0", "LA33583-8", "LA34855-9"];
+           const csLabMolecularDetectionResult = ["LA11882-0", "LA11883-8", "LA9663-1", "LA13548-5"];
+
+           bru.setVar("41853-3", csLabMolecularDetectionResult[Math.floor(Math.random() * csLabMolecularDetectionResult.length)]);
+           bru.setVar("100383-9", csLabMolecularDetectionResult[Math.floor(Math.random() * csLabMolecularDetectionResult.length)]);
+           bru.setVar("CS_MPOX_CLADE_SPECIFIC_PCR_RESULT", ["100889-5", "106578-8", "106579-6", "100888-7"][Math.floor(Math.random() * 4)]);
+           bru.setVar("CS_MPOX_CLADE_SPECIFIC_PCR_RESULT_VALUE", csLabMolecularDetectionResult[Math.floor(Math.random() * csLabMolecularDetectionResult.length)]);
+           bru.setVar("106615-8", csMpoxMpxvClade[Math.floor(Math.random() * csMpoxMpxvClade.length)]);
+           bru.setVar("CS_MPOX_MPOC_TEST_RESULT", csLabMolecularDetectionResult[Math.floor(Math.random() * csLabMolecularDetectionResult.length)]);
+           bru.setVar("101002-4", ["LAB_SEQ_COMPLETE_GENOME", "LAB_SEQ_PARTIAL_GENOME", "LAB_SEQ_FAILED"][Math.floor(Math.random() * 3)]);
+           bru.setVar("101003-2", csMpoxMpxvClade[Math.floor(Math.random() * csMpoxMpxvClade.length)]);
+           bru.setVar("101004-0", ["B.1", "C.1", "F.1"][Math.floor(Math.random() * 3)]);
+        
+           return await bru.runRequest("create-lis-mpox-diagnostic-report.yml");
+        }
+
+        async function cholera() {
+           const cholSg01BiovarCholeraeCodes = ["CHOL_SG_O1_BIOVAR_CHOLERAE", "CHOL_SG_O1_BIOVAR_ELTOR", "CHOL_SG_O139", "CHOL_SG_O1_AND_O139", "CHOL_SG_NEGATIVE", "CHOL_SG_INCONCLUSIVE"];
+           const csLabAntimicrobialSusceptibility = ["LAB_AST_SUSCEPTIBLE", "LAB_AST_RESISTANT", "LAB_AST_INCONCLUSIVE"];
+
+           bru.setVar("CS_CHOL_RDT_RESULT_CHOLERA", cholSg01BiovarCholeraeCodes[Math.floor(Math.random() * cholSg01BiovarCholeraeCodes.length)]);
+           bru.setVar("6579-7", cholSg01BiovarCholeraeCodes[Math.floor(Math.random() * cholSg01BiovarCholeraeCodes.length)]);
+           bru.setVar("CS_CHOL_PCR_RESULT_SEROGROUP", ["97314-9", "61371-1"][Math.floor(Math.random() * 2)]);
+           bru.setVar("CS_CHOL_PCR_RESULT_SEROGROUP_VALUE", cholSg01BiovarCholeraeCodes[Math.floor(Math.random() * cholSg01BiovarCholeraeCodes.length)]);
+           bru.setVar("80680-2", ["LAB_MOL_DETECTED", "LAB_MOL_NOT_DETECTED", "LAB_MOL_INCONCLUSIVE", "LAB_MOL_SPECIMEN_UNSATISFACTORY"][Math.floor(Math.random() * 4)]);
+           bru.setVar("18866-4", csLabAntimicrobialSusceptibility[Math.floor(Math.random() * csLabAntimicrobialSusceptibility.length)]);
+           bru.setVar("18906-8", csLabAntimicrobialSusceptibility[Math.floor(Math.random() * csLabAntimicrobialSusceptibility.length)]);
+           bru.setVar("18917-5", csLabAntimicrobialSusceptibility[Math.floor(Math.random() * csLabAntimicrobialSusceptibility.length)]);
+           bru.setVar("18919-1", csLabAntimicrobialSusceptibility[Math.floor(Math.random() * csLabAntimicrobialSusceptibility.length)]);
+           bru.setVar("18963-9", csLabAntimicrobialSusceptibility[Math.floor(Math.random() * csLabAntimicrobialSusceptibility.length)]);
+           bru.setVar("18993-6", csLabAntimicrobialSusceptibility[Math.floor(Math.random() * csLabAntimicrobialSusceptibility.length)]);
+
+           return await bru.runRequest("create-lis-cholera-diagnostic-report");
+        }
 
 settings:
   encodeUrl: true

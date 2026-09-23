@@ -48,9 +48,11 @@
         - transform:
             description: |
               Builds a list of key-value pairs where the key is the LOINC code and the value is the DHIS2 data element code.
-            groovy: |
+            groovy: |     
               body.collectEntries {
-                  de -> [(de.attributeValues.find {
+                  de -> de.attributeValues.find {
                       attr -> attr.attribute.id == '{{dhis2.loincCodesAttribute.id}}'
-                  }.value): de.code]
+                  }.value.split(' ').collectEntries {
+                      v -> [(v) : de.code]
+                  }
               }
