@@ -12,7 +12,7 @@ As defined in [Laboratory Information Systems Project Management: A Guidebook fo
 
 This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker program used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the structural and semantic differences between the FHIR and DHIS2 resources.
 
-This is a working example meant to technically guide you in developing your own integration between an LIS and DHIS2. It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
+The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a working example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
 
 ## Quick Start
 
@@ -33,8 +33,8 @@ This is a working example meant to technically guide you in developing your own 
    * Install the test development dependencies
    * Build the IOL application
    * Stand-up the components which include: 
-     * DHIS2 which is reachable from `http://localhost:8080/`
-     * a mock LIS which is reachable from `http://localhost:8081/`
+     * a DHIS2 instance reachable from `http://localhost:8080/`
+     * a mock LIS which is a HAPI FHIR server reachable from `http://localhost:8081/`
      * the IOL running as a background process
 4. From your browser, type the following in the address bar to open the enrollment form for the case surveillance program: http://localhost:8080/apps/capture#/new?orgUnitId=DiszpKrYNg8&programId=N07iEegH3Hw. Alternatively, follow these steps:
    1. Open the Capture app from the DHIS2 dashboard in your local DHIS2 instance on `http://localhost:8080/`
@@ -46,7 +46,7 @@ This is a working example meant to technically guide you in developing your own 
 7. From the enrollment dashboard, click on _New Lab request event_
    1. Choose a date from the _Date of data entry_ date picker
    2. Insert a random identifier like `123456` in the _Specimen ID_ field (the specimen ID must always be unique across all lab request events)
-   3. Press the `Complete` button, located at bottom of the formsemantic
+   3. Press the `Complete` button, located at bottom of the form
 8. From a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration/tests/create-fake-lab-diagnostic-report-collection` and launch `bru run fetch-lab-requests-from-dhis2.yml` to simulate the laboratory instrument. Wait until the command completes before moving on to the next step.
 9. Wait at least a minute or two before refreshing the DHIS2 enrollment dashboard in order to give time for the LIS laboratory report to be imported into DHIS2. After the refresh, an event should appear under the _Lab report_ section of the enrollment dashboard. Try refreshing the page a couple of more times if the event does not show up.
 10. Open the lab report event to view the laboratory diagnosis confirming or refuting the initial Ebola diagnosis.
@@ -69,7 +69,7 @@ The following sections drill down into the stages that are relevant to the lab r
 
 #### Enrollment Stage
 
-A disease surveillance case in DHIS2 starts with enrolment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enrol the person into the program. In the enrolment form shown below, the initial diagnosis can be either cholera, ebola, or mpox.
+A disease surveillance case in DHIS2 starts with enrolment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enrol the person into the program. In the enrolment form shown below, the initial diagnosis can be either cholera, Ebola, or mpox.
 
 ![Enrollment form](docs/enrollment-form.png)
 
@@ -109,20 +109,22 @@ The DHIS2 implementer benefits from having the transformation of the lab result 
 
 ### Lab Information System
 
-The LIS is the source of the lab results in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, in this reference implementation, a script runner is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
+The LIS is the source of the lab reports in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, for this reference implementation, a test kit is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
 
-HAPI FHIR is the server powering the mock LIS. FHIR (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface. HAPI FHIR is a popular open-source server implementation of FHIR and is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). At the time of writing, the guide is still in draft stage, nevertheless, it was selected to represent the lab result communication due to its broad scope thanks to the participation of experts from several countries, projects, and initiatives. 
+HAPI FHIR is a popular open-source server implementation of FHIR that powers the mock LIS. [FHIR](https://hl7.org/fhir/overview.html) (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface.
 
-The IG profiles several FHIR resources though the following are used in this project:
+The FHIR server is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). The guide is still in draft stage at the time of writing. Nevertheless, it was selected to represent the lab report exchange thanks to its broad scope due to the participation of experts from several countries, projects, and initiatives. 
 
-* Specimen: holds the specimen ID and the date the specimen was received at the lab
-* Observation: contains the LOINC codes identifying the test carried out and its result
-* Patient: the test subject which can be anonymous so as to safeguard patient data
-* DiagnosticReport: bundles together the specimen, observation, and patient resources while provides a status 
+The IG profiles several FHIR resources though the following are exchanged in this integration:
+
+* [Specimen](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Specimen-uv-lab.html): holds the specimen ID and the date the specimen was received at the lab
+* [Observation](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Observation-resultslab-uv-lab.html): contains the LOINC codes, or the DHIS2 codes as free-form text, identifying the test carried out and its result
+* [Patient](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Patient-uv-lab.html): the test subject which can be anonymous, safeguarding patient data
+* [DiagnosticReport](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-DiagnosticReport-uv-lab.html): bundles together the specimen, observation, and patient resources 
 
 ### Interoperability Layer
 
-The interoperability layer (IOL) is a low-code and customisable [Apache Camel](https://camel.apache.org/) background application running inside a Java Virtual Machine (JVM) that bridges the LIS diagnostic report to the DHIS2 lab report program stage. Its operation is broadly broken down in the following steps:
+The interoperability layer (IOL) is a low-code and customisable [Apache Camel](https://camel.apache.org/) background application running inside a Java Virtual Machine (JVM) that bridges the LIS diagnostic report to the DHIS2 lab report program stage. Its processing is broadly broken down in the following steps:
 
 1. The application routinely fetches active enrollments from DHIS2 having program ID `N07iEegH3Hw` (i.e., case surveillance program) with the subsequent GET HTTP call: `.../api/tracker/enrollments?program=N07iEegH3Hw&status=ACTIVE&fields=enrollment,events`.
 
@@ -135,9 +137,9 @@ The interoperability layer (IOL) is a low-code and customisable [Apache Camel](h
 
    2. Search for events within the fetched active cases such that the event program stage ID is equal to `N07iEegH3Hw` (i.e., the lab request program stage) and the status is equal to `COMPLETED`. 
 
-   3. For each lab request, extract its specimen ID and attempts to retrieve the corresponding lab report within the enrollment matching the specimen ID. If the corresponding lab report within the case is retrieved, then this means that a diagnostic report for the lab request already exists in the LIS .
+   3. For each lab request, extract its specimen ID and attempt to retrieve the corresponding lab report within the enrollment matching the specimen ID. If the corresponding lab report within the case is retrieved, then this means that a diagnostic report for the lab request already exists in the LIS .
 
-   4. Record the `updatedAt` timestamp of the most recent lab result should one exist. This timestamp enables the IOL to fetch updates to the LIS diagnostic report.
+   4. Record the `updatedAt` timestamp of the DHIS2 lab report should one exist. This timestamp keeps the IOL from fetching the LIS diagnostic report if it was not updated after `updatedAt` timestamp.
 
    5. Search for _final_, _amended_, _appended_, or _corrected_ diagnostic reports by the lab request specimen ID in the LIS. A key constraint in the reference implementation is that the specimen ID is unique across laboratory orders so the IOL assumes that the LIS returns at most a single diagnostic report for a given specimen ID. The IOL behaviour is undefined when multiple diagnostic reports are in the search results. The GET HTTP call to search the reports is  `.../fhir/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[labReportUpdatedAt]` where:
       * `[specimenId]` is substituted with the lab request specimen ID, and 
@@ -145,14 +147,16 @@ The interoperability layer (IOL) is a low-code and customisable [Apache Camel](h
 
    6. Transform the diagnostic report, if found, into a DHIS2 event using the DataSonnet script fetched in step _2ia_ and map the LOINC codes into data element and option set value codes by looking up the mappings downloaded from step _2ib_ and _2ic_. 
 
-   7. Import the event into DHIS2 with an HTTP POST sent to the endpoint `.../api/tracker?async=false&importStrategy=CREATE_AND_UPDATE` where the:
+   7. Import the event into DHIS2 with an HTTP POST sent to the endpoint `.../api/tracker?async=false&importStrategy=CREATE_AND_UPDATE&dataElementIdScheme=CODE` where the:
       * `async` query parameter is set to `false` so that the event is imported synchronously leading to any import errors being reported and logged immediately.
       * `importStrategy` query parameter is set to `CREATE_AND_UPDATE` so that lab report event is updated should one exist.
+      * `dataElementIdScheme` is set to `CODE` since the transformation result from step _6_ references the data elements by code.
 
-The IOL is configured through one or more YAML files. The subsequent table lists the parameters that can be configured in the IOL:
+The IOL is configurable through one or more YAML files and/or command-line arguments. The subsequent table lists the parameters that can be configured in the IOL:
 
 |           **Parameter Name**            | **Description**                                                                           |
 |:---------------------------------------:|:------------------------------------------------------------------------------------------|
+|              run.interval               | Quartz expression denoting the schedule for polling DHIS2 lab requests                    |
 |              dhis2.api.url              | Web API base path of the DHIS2 server                                                     |
 |           dhis2.api.username            | Username of the DHIS2 Web API user. Required when not using PAT authentication            |
 |           dhis2.api.password            | Password of the DHIS2 Web API user. Required when not using PAT authentication            |
@@ -177,49 +181,32 @@ Notably, besides metadata, the script inside the DHIS2 data store used to transf
 
 ### Interoperability Layer
 
-A good understanding of Apache Camel is a prerequisite to customising the IOL. The DHIS2 developer documentation provides a gentle introduction to Apache Camel. The behaviour of the IOL is mostly defined in the YAML configs located in `iol/src/main/resources/camel`. Below is a description of each config's role:
+A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. The behaviour of the IOL is mostly defined in the YAML configs located in the `iol/src/main/resources/camel` project path. Below is a description of each config's role:
 
 * [main.camel.yaml](iol/src/main/resources/camel/main.camel.yaml) - Kicks off the routine scan of active enrollments
 * [fetch-diagnostic-report.camel.yaml](iol/src/main/resources/camel/fetch-diagnostic-report.camel.yaml) - Fetches the diagnostic report from the FHIR server.
 * [get-de-code-dict.camel.yaml](iol/src/main/resources/camel/get-de-code-dict.camel.yaml) - Builds a mapping between the LOINC codes and the DHIS2 data element codes.
 * [get-opt-code-dict.camel.yaml](iol/src/main/resources/camel/get-opt-code-dict.camel.yaml) - Builds a mapping between the LOINC codes and the DHIS2 option set value codes
-* [get-transform-script.camel.yaml](iol/src/main/resources/camel/get-transform-script.camel.yaml) - Fetches the DataSonnet transformation script from the DHIS2 data store that transforms the FHIR resources to DHIS2
-  resources.
-* [process-enrollment.camel.yaml](iol/src/main/resources/camel/process-enrollment.camel.yaml) - Pulls out completed lab request events from the enrollment before sending the events downstream for further
-  processing.
-* [process-lab-request.camel.yaml](iol/src/main/resources/camel/process-lab-request.camel.yaml) - Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the
-  message to be final stage of processing
+* [get-transform-script.camel.yaml](iol/src/main/resources/camel/get-transform-script.camel.yaml) - Fetches the DataSonnet transformation script from the DHIS2 data store that transforms the FHIR resources to DHIS2 resources.
+* [process-enrollment.camel.yaml](iol/src/main/resources/camel/process-enrollment.camel.yaml) - Pulls out completed lab request events from the enrollment before sending the events downstream for further processing.
+* [process-lab-request.camel.yaml](iol/src/main/resources/camel/process-lab-request.camel.yaml) - Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the message to be final stage of processing
 * [import-lab-report.camel.yaml](iol/src/main/resources/camel/import-lab-report.camel.yaml) - Imports lhe lab report into DHIS2.
 
-What follows are some common adaptation scenarios:
+What follows are some common questions to adaptation:
+
+#### My LIS conforms to a different FHIR IG or I need to fetch different FHIR resources from the LIS for the lab report. How do I configure the IOL to read and transform the right resources?
+
+Within the `fetch-diagnostic-report.camel.yaml` IOL config, change the URL path of the `simple` expression within the `setHeader` key to include or exclude the required FHIR resources from the LIS search results. The [official FHIR documentation](https://hl7.org/fhir/search.html) describes the search operations that can be expressed in the URL path. 
 
 #### How to turn the IOL from a polling consumer into an event-driven one to improve the timeliness of lab reports in DHIS2 and eliminate the performance costs tied to polling?
 
-Change the `from` endpoint in the `main.camel.yaml` config such that it listens for events from DHIS2 using an event-driven mechanism like PostgreSQL Logical Replication. The Camel Debezium component can be used to listen for database events.
+Change the `from` endpoint in the `main.camel.yaml` config such that it listens for events from DHIS2 using an event-driven mechanism like [PostgreSQL Logical Replication](https://www.postgresql.org/docs/current/logical-replication.html). To simplify customisation, configure the [Camel Debezium PostgreSQL component](https://camel.apache.org/components/next/debezium-postgres-component.html) to listen for database events which uses PostgreSQL Logical Replication under the hood.
 
-#### How to reverse the direction of the data flow such that IOL polls the FHIR server instead of DHIS2?
+When an event triggers execution in the IOL, you should factor the possibility that the diagnostic report is not yet available or the LIS is offline. Having the IOL retry every so often to fetch the diagnostic report in the event thread is not a good strategy in terms of resource allocation since it can lead to resource starvation. Instead, consider persisting or caching the lab request in the IOL and routinely dispatching a thread from a thread pool to process the locally stored lab requests. The tradeoff being made here is building more complexity into the IOL in favour of efficiency.
 
-Inside the `main.camel.yaml` config, substitute the DHIS2 endpoint in the `to` endpoint with the FHIR URI and replace the `fetch-diagnostic-report.camel.yaml` config to fetch Tracker events from DHIS2 instead of fetching diagnostic reports from the LIS.
+#### How to integrate with a non-FHIR LIS?
 
-#### How to communicate with a non-FHIR LIS?
-
-It is a reasonable assumption that most LISs do not speak FHIR. Adapting this implementation to talk with a non-FHIR LIS entails modifying the `fetch-diagnostic-report.camel.yaml` config. In particular, the endpoint `uri` key of the `to` processor should be changed to use a different component. Apache Camel  
-
-### Terminology mapping
-
-The mapping of laboratory terms between an LIS and DHIS2 is likely to be a complex exercise. The LIS terminology in this illustration is LOINC. While every effort was made to map the DHIS2 data elements and option value codes to their LOINC code counterparts, this was not always possible. When it was not possible, free-form text as opposed to a LOINC code was used. Other ways to 
-
-to DHIS2 data element as well as option value codes. There will be occasions when the terms do not align well or even the .. Such semantic dissonance cannot be bridge in the IOL 
-
-* Free-form text
-* Value set
-* Changing the DHIS2 programme
-* IOL
-
-
-However,  free-form text or value set
-
-### Data Format
+At the time of writing, most LISs do not speak FHIR and ground realities could make it impractical to hide the LIS behind a FHIR Facade. Adapting the IOL to talk with a non-FHIR LIS entails replacing the FHIR endpoints in the IOL configs while also swapping out the unmarshal processors with ones that can unmarshal the new format (e.g., HL7v2). Apache Camel has a [large catalogue of components](https://camel.apache.org/components/next/index.html) from which you can choose to integrate with different LISs. Moreover, given Camel's open architecture, you can always develop your own component when the provided ones do not meet your needs.
 
 ## Security & Privacy Considerations
 
@@ -229,7 +216,7 @@ The focus of this implementation is to illustrate technical interoperability. Se
 
 * The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. In some situations, $n$ might be too big which means lab results can take a considerable time to appear in the enrollment dashboard:
   * One reason for this is because enrollments are left open instead of being marked as complete by the DHIS2 user. A simple solution could be to include a step in your standard operating procedures that instructs the DHIS2 user to complete the enrollment once the case is finished.
-  * Simply having a lab requests could be another reason. In such cases, one ought to consider re-implementing the IOL as an event-driven consumer instead of a polling one and then cache the lab requests in the IOL. The cache would need to be re-populated when the IOL state is lost (e.g., restart).
+  * Simply having too many laboratory orders could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling)
 
 * HAPI FHIR is configured to use the remote terminology server [tx.fhir.org](http://tx.fhir.org) for validating the LOINC codes. This terminology server is unsuited for production use as it can be taken down at any time for maintenance. Furthermore, it is not provisioned for scale.
 
