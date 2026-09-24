@@ -12,10 +12,7 @@
 * [Adaptation](#adaptation)
    + [DHIS2](#dhis2-1)
    + [Interoperability Layer](#interoperability-layer-1)
-      - [My LIS conforms to a different FHIR IG or I need to fetch different FHIR resources from the LIS for the lab report. How do I configure the IOL to read and transform the right resources?](#my-lis-conforms-to-a-different-fhir-ig-or-i-need-to-fetch-different-fhir-resources-from-the-lis-for-the-lab-report-how-do-i-configure-the-iol-to-read-and-transform-the-right-resources)
-      - [How to turn the IOL from a polling consumer into an event-driven one to improve the timeliness of lab reports in DHIS2 and eliminate the performance costs tied to polling?](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling)
-      - [How to integrate with a non-FHIR LIS?](#how-to-integrate-with-a-non-fhir-lis)
-* [Security & Privacy Considerations](#security-privacy-considerations)
+* [Security & Privacy Considerations](#security--privacy-considerations)
 * [Performance Considerations](#performance-considerations)
 * [Support](#support)
 
@@ -106,17 +103,16 @@ After the lab request is the lab report program stage. As described in the [Inte
 
 ![Lab result form](docs/lab-result-form.png)
 
-In this illustration, a case can have multiple lab reports but a lab request can only have a single lab report. Lab report updates represent corrections or amendments in the source laboratory report. The lab result status change is reflected in the event notes section like what is presented here:
+In this illustration, a case can have multiple lab requests and reports but a lab request can only have a single lab report. Lab report updates represent corrections or amendments to the original laboratory report. The lab result status change is reflected in the event notes section like what is presented here:
 
 ![Lab result notes](docs/lab-result-notes.png)
 
 ---
 
-As part of the lab result integration, DHIS2 drives the transformation and terminology mapping in the IOL such that the lab result can be imported into DHIS2. In terms of FHIR-to-DHIS2 JSON transformation, the DHIS2 data store holds the [DataSonnet](https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html) script translating the FHIR resources into DHIS2 resources.
+As part of the lab report integration, it is DHIS2 that drives the transformation and terminology mapping in the IOL which allows the lab report to be imported into DHIS2. More concretely, the FHIR-to-DHIS2 JSON transformation script is kept in the DHIS2 data store which the IOL retrieves and executes with DataSonnet. DataSonnet is a JSON-extended template that lends well to JSON-to-JSON transformations. 
 
 ![FHIR-to-DHIS2 transform script](docs/datastore-transform-script.png)
 
-DataSonnet is a JSON-extended template that lends well to JSON-to-JSON transformations. 
 
 In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps either the LOINC code `LA11882-0` or `LA6576-8` to the option set value `POSITIVE`. 
 
@@ -209,7 +205,7 @@ A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequis
 * [process-lab-request.camel.yaml](iol/src/main/resources/camel/process-lab-request.camel.yaml) - Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the message to be final stage of processing
 * [import-lab-report.camel.yaml](iol/src/main/resources/camel/import-lab-report.camel.yaml) - Imports lhe lab report into DHIS2.
 
-What follows are some common questions to adaptation:
+What follows are answers to some common questions to customisation:
 
 #### My LIS conforms to a different FHIR IG or I need to fetch different FHIR resources from the LIS for the lab report. How do I configure the IOL to read and transform the right resources?
 
@@ -231,9 +227,9 @@ The focus of this implementation is to illustrate technical interoperability. Se
 
 ## Performance Considerations
 
-* The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. In some situations, $n$ might be too big which means lab results can take a considerable time to appear in the enrollment dashboard:
+* The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. A large $n$ can lead to lab reports taking a considerable time to appear in the DHIS2 enrollment dashboard. 
   * One reason for this is because enrollments are left open instead of being marked as complete by the DHIS2 user. A simple solution could be to include a step in your standard operating procedures that instructs the DHIS2 user to complete the enrollment once the case is finished.
-  * Simply having too many laboratory orders could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling)
+  * Simply having too many laboratory orders could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling).
 
 * HAPI FHIR is configured to use the remote terminology server [tx.fhir.org](http://tx.fhir.org) for validating the LOINC codes. This terminology server is unsuited for production use as it can be taken down at any time for maintenance. Furthermore, it is not provisioned for scale.
 
