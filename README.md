@@ -17,7 +17,7 @@ This is a working example meant to technically guide you in developing your own 
 ## Quick Start
 
 1. From the machine where you intend to run the reference implementation:
-   1. [Install Node](https://nodejs.org/en/download) to allow you to run Yarn.
+   1. [Install Node](https://nodejs.org/en/download) so that you can run Yarn
    2. [Install Yarn](https://yarnpkg.com/getting-started/install) to facilitate the building and running of the project
    3. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
    4. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a source code management tool
