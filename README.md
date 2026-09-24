@@ -1,6 +1,23 @@
 # DHIS2 Tracker Lab Result Integration - reference implementation [DRAFT]
 
-[ToC TODO]
+* [What is this implementation?](#what-is-this-implementation)
+* [Quick Start](#quick-start)
+* [Overview](#overview)
+   + [DHIS2](#dhis2)
+      - [Enrollment Stage](#enrollment-stage)
+      - [Lab Request Stage](#lab-request-stage)
+      - [Lab Report Stage](#lab-report-stage)
+   + [Lab Information System](#lab-information-system)
+   + [Interoperability Layer](#interoperability-layer)
+* [Adaptation](#adaptation)
+   + [DHIS2](#dhis2-1)
+   + [Interoperability Layer](#interoperability-layer-1)
+      - [My LIS conforms to a different FHIR IG or I need to fetch different FHIR resources from the LIS for the lab report. How do I configure the IOL to read and transform the right resources?](#my-lis-conforms-to-a-different-fhir-ig-or-i-need-to-fetch-different-fhir-resources-from-the-lis-for-the-lab-report-how-do-i-configure-the-iol-to-read-and-transform-the-right-resources)
+      - [How to turn the IOL from a polling consumer into an event-driven one to improve the timeliness of lab reports in DHIS2 and eliminate the performance costs tied to polling?](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling)
+      - [How to integrate with a non-FHIR LIS?](#how-to-integrate-with-a-non-fhir-lis)
+* [Security & Privacy Considerations](#security-privacy-considerations)
+* [Performance Considerations](#performance-considerations)
+* [Support](#support)
 
 ## What is this implementation?
 
