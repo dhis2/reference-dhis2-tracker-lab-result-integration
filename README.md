@@ -112,10 +112,9 @@ In this illustration, a case can have multiple lab requests and reports but a la
 
 ---
 
-As part of the lab report integration, it is DHIS2 that drives the transformation and terminology mapping in the IOL which allows the lab report to be imported into DHIS2. More concretely, the FHIR-to-DHIS2 JSON transformation script is kept in the DHIS2 data store which the IOL retrieves and executes with DataSonnet. DataSonnet is a JSON-extended template that lends well to JSON-to-JSON transformations. 
+As part of the lab report integration, it is DHIS2 itself that drives the transformation and terminology mapping in the IOL, allowing the lab report to be imported into DHIS2. More concretely, the FHIR-to-DHIS2 JSON transformation script is kept in the DHIS2 data store which the IOL retrieves and executes with DataSonnet. [DataSonnet](https://datasonnet.github.io/datasonnet-mapper/datasonnet/latest/index.html) is a JSON-extended template that lends well to JSON-to-JSON transformations. The subsequent screenshot demonstrates the DataSonnet script as viewed from the DHIS2 data store app:
 
 ![FHIR-to-DHIS2 transform script](docs/datastore-transform-script.png)
-
 
 In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps either the LOINC code `LA11882-0` or `LA6576-8` to the option set value `POSITIVE`. 
 
@@ -178,12 +177,12 @@ The IOL is configurable through one or more YAML files and/or command-line argum
 |           dhis2.api.password            | Password of the DHIS2 Web API user. Required when not using PAT authentication            |
 |              dhis2.api.pat              | PAT of the DHIS2 server Web API user. Required when not using basic access authentication |
 |         dhis2.api.readTimeoutMs         | Time to wait for a web response from DHIS2 before giving up                               |
-|      dhis2.loincCodesAttribute.id       | Attribute ID capture the LOINC code                                                       |
+|      dhis2.loincCodesAttribute.id       | ID of the attribute capturing the LOINC code                                              |
 |            dhis2.program.id             | ID of the DHIS2 Tracker program holding                                                   |
 |  dhis2.program.specimenDataElement.id   | ID of the specimen data element holding the specimen ID                                   |
 | dhis2.program.labRequestProgramStage.id | ID of the DHIS2 lab request program stage                                                 |
 | dhis2.program.labReportProgramStage.id  | ID of the DHIS2 lab report program stage                                                  |
-|               lis.api.url               | URL pointing to the mock LIS server                                                       |
+|               lis.api.url               | URL pointing to the LIS server                                                            |
 
 ## Adaptation
 
