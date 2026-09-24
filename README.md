@@ -92,11 +92,11 @@ A disease surveillance case in DHIS2 starts with enrolment of a person having a 
 
 #### Lab Request Stage
 
-The lab request stage is used for reporting the laboratory order and to link the LIS laboratory result to the surveillance case. The link is established thanks to the specimen ID which is entered into this stage's data entry form shown next:
+The lab request stage is used to report the laboratory order and link the LIS laboratory result to the surveillance case. The link is established thanks to the specimen ID which is entered into this stage's data entry form shown next:
 
 ![Lab request form](docs/lab-request-form.png)
 
-The specimen ID field shown above is mandatory and is expected to be unique for each lab request, even across cases. In other implementation contexts, instead of the specimen ID, alternative or additional unique linking identifiers could be required such as the patient name or the case ID, each with their own tradeoffs.
+The mandatory specimen ID field shown is expected to be unique for each lab request, even across cases. In other workflows, instead of the specimen ID, alternative or additional unique linking identifiers could be required such as the patient name or the case ID, each with their own tradeoffs.
 
 Completing the lab request form does not trigger a laboratory order. It is assumed that the laboratory test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a test kit that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding laboratory reports, and transmits the reports to the mock LIS.
 
@@ -193,7 +193,7 @@ The DHIS2-LIS reference implementation needs be adapted to fit your local needs 
 
 The DHIS2 metadata needs to be localised during customisation. This includes the organisation units, data elements, option sets, attributes capturing the laboratory terminology, and the Tracker program itself. [Enrol in the DHIS2 online academies](https://academy.dhis2.org/) if you want to learn how to configure DHIS2.
 
-Notably, besides metadata, the script inside the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the changes to your Tracker programme. As a side note, changes to the transformation script would likely go hand-in-hand with the IOL since it is the IOL that parses the LIS laboratory report and makes the data visible to the transformation script.
+Notably, besides metadata, the script inside the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the differences in your Tracker programme. As a side note, changes to the transformation script would likely go hand-in-hand with changes the IOL since it is the IOL that parses the LIS laboratory report and makes the unmarshaled report visible to the transformation script.
 
 ### Interoperability Layer
 
@@ -218,17 +218,17 @@ Within the `fetch-diagnostic-report.camel.yaml` IOL config, change the URL path 
 
 Change the `from` endpoint in the `main.camel.yaml` config such that it listens for events from DHIS2 using an event-driven mechanism like [PostgreSQL Logical Replication](https://www.postgresql.org/docs/current/logical-replication.html). To simplify customisation, configure the [Camel Debezium PostgreSQL component](https://camel.apache.org/components/next/debezium-postgres-component.html) to listen for database events which uses PostgreSQL Logical Replication under the hood.
 
-When an event triggers execution in the IOL, you should factor the possibility that the diagnostic report is not yet available or the LIS is offline. Having the IOL retry every so often to fetch the diagnostic report in the event thread is not a good strategy in terms of resource allocation since it can lead to resource starvation. Instead, consider persisting or caching the lab request in the IOL and routinely dispatching a thread from a thread pool to process the locally stored lab requests. The tradeoff being made here is building more complexity into the IOL in favour of efficiency.
+When an event triggers execution in the IOL, you should factor the possibility that the diagnostic report is not yet available or the LIS is offline. Having the IOL retry every so often to fetch the diagnostic report in the event thread is not a good strategy in terms of resource allocation since it can lead to resource starvation. Instead, consider persisting or caching the lab request in the IOL and routinely dispatching a thread from a  pool of threads to process the locally stored lab requests. The tradeoff being made here is building more complexity into the IOL in favour of efficiency.
 
 #### How to integrate with a non-FHIR LIS?
 
-At the time of writing, most LISs do not speak FHIR and ground realities could make it impractical to hide the LIS behind a FHIR Facade. Adapting the IOL to talk with a non-FHIR LIS entails replacing the FHIR endpoints in the IOL configs while also swapping out the unmarshal processors with ones that can unmarshal the new format (e.g., HL7v2). Apache Camel has a [large catalogue of components](https://camel.apache.org/components/next/index.html) from which you can choose to integrate with different LISs. Moreover, given Camel's open architecture, you can always develop your own component when the provided ones do not meet your needs.
+At the time of writing, most LISs do not speak FHIR and facts on ground could make it impractical to hide the LIS behind a FHIR Facade. Adapting the IOL to talk with a non-FHIR LIS entails replacing the FHIR endpoints in the IOL configs while also swapping out the unmarshal processors with ones that can unmarshal the new format (e.g., HL7v2). Apache Camel has a [large catalogue of components](https://camel.apache.org/components/next/index.html) from which you can choose to integrate with different LISs. Moreover, given Camel's open architecture, you can always develop your own component when the provided ones do not meet your needs.
 
 Additionally, depending on the LIS data format, the choice of transformation engine (i.e., DataSonnet) might need to be revisited or pre-transformation steps added to prepare the data for transformation. 
 
 ## Security & Privacy Considerations
 
-The focus of this implementation is to illustrate technical interoperability. Even though the integration was designed to exclude personal identifiable information from the data exchange, many other security and privacy concerns are not addressed. It is therefore important that the integration undergoes a security and privacy review prior to adaptation.
+The focus of this implementation is to illustrate technical interoperability. Many security and privacy concerns are not addressed even though the integration was designed to exclude personal identifiable information from the data exchange. It is therefore important that the integration undergoes a security and privacy review prior to adaptation.
 
 ## Performance Considerations
 
