@@ -17,12 +17,13 @@ This is a working example meant to technically guide you in developing your own 
 ## Quick Start
 
 1. From the machine where you intend to run the reference implementation:
-   1. [Install Yarn](https://yarnpkg.com/getting-started/install) to facilitate the building and running of the project
-   2. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
-   3. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a source code management tool
-   4. [Install the Bruno script runner](https://docs.usebruno.com/bru-cli/installation) to simulate the laboratory instrument that sends the diagnostic results to the LIS
-2. Run the command shown next to download the reference implementation repository: `git clone https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration.git`
-3. Within a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration` and run:
+   1. [Install Node](https://nodejs.org/en/download) to allow you to run Yarn.
+   2. [Install Yarn](https://yarnpkg.com/getting-started/install) to facilitate the building and running of the project
+   3. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
+   4. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a source code management tool
+   5. [Install the Bruno script runner](https://docs.usebruno.com/bru-cli/installation) to simulate the laboratory instrument that sends the diagnostic results to the LIS
+2. Within a terminal, run the command shown next to download the reference implementation repository: `git clone https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration.git`
+3. Change the current directory in your terminal to `reference-dhis2-tracker-lab-result-integration` and run:
    ```sh
    yarn install --frozen-lockfile
    yarn build
@@ -46,8 +47,8 @@ This is a working example meant to technically guide you in developing your own 
    1. Choose a date from the _Date of data entry_ date picker
    2. Insert a random identifier like `123456` in the _Specimen ID_ field (the specimen ID must always be unique across all lab request events)
    3. Press the `Complete` button, located at bottom of the formsemantic
-8. From a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration/tests/create-fake-lab-diagnostic-report-collection` and launch `bru run create-lis-ebola-diagnostic-report.yml` to simulate the laboratory instrument. Wait until the command completes before moving on to the next step.
-9. Wait at least a minute before refreshing the DHIS2 enrollment dashboard in order to give time for the LIS laboratory result to be imported into DHIS2. After the refresh, an event should appear under the _Lab report_ section of the enrollment dashboard but try refreshing the page a couple of more times if the event does not show up.
+8. From a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration/tests/create-fake-lab-diagnostic-report-collection` and launch `bru run fetch-lab-requests-from-dhis2.yml` to simulate the laboratory instrument. Wait until the command completes before moving on to the next step.
+9. Wait at least a minute or two before refreshing the DHIS2 enrollment dashboard in order to give time for the LIS laboratory report to be imported into DHIS2. After the refresh, an event should appear under the _Lab report_ section of the enrollment dashboard. Try refreshing the page a couple of more times if the event does not show up.
 10. Open the lab report event to view the laboratory diagnosis confirming or refuting the initial Ebola diagnosis.
 
 ## Overview
@@ -68,7 +69,7 @@ The following sections drill down into the stages that are relevant to the lab r
 
 #### Enrollment Stage
 
-A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enroll the person into the program. In the enrollment form shown below, the initial diagnosis can be either cholera, ebola, or mpox.
+A disease surveillance case in DHIS2 starts with enrolment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enrol the person into the program. In the enrolment form shown below, the initial diagnosis can be either cholera, ebola, or mpox.
 
 ![Enrollment form](docs/enrollment-form.png)
 
