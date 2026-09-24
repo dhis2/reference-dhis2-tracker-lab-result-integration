@@ -36,7 +36,10 @@ The expected audience of this reference implementation are enterprise and soluti
    3. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
    4. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a source code management tool
    5. [Install the Bruno script runner](https://docs.usebruno.com/bru-cli/installation) to simulate the laboratory instrument that sends the diagnostic results to the LIS
-2. Within a terminal, run the command shown next to download the reference implementation repository: `git clone https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration.git`
+2. Within a terminal, run the command shown next to download the reference implementation repository:
+    ```sh
+    git clone https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration.git
+    ```
 3. Change the current directory in your terminal to `reference-dhis2-tracker-lab-result-integration` and run:
    ```sh
    yarn install --frozen-lockfile
@@ -118,7 +121,7 @@ In terms of terminology mapping, DHIS2 binds the data elements and option set va
 
 ![Option set value](docs/option-set-value.png)
 
-The DHIS2 implementer benefits from having the transformation of the lab result driven by DHIS2. Such separation of logic permits the implementer to revise the LOINC-to-DHIS2 code mappings within DHIS2 without needing to enlist the technical team maintaining the IOL. Taking this one step further, an implementer proficient in DataSonnet and the DHIS2 Web API could adjust the transformation script in the DHIS2 data store caused by changes in the lab result program stage or the LIS.
+The DHIS2 implementer benefits from having the transformation of the lab report driven by DHIS2. Such separation of logic permits the implementer to revise the LOINC-to-DHIS2 code mappings within DHIS2 without needing to enlist the technical team maintaining the IOL. Taking one step further, an implementer proficient in DataSonnet and the DHIS2 Web API could adjust the transformation script in the DHIS2 data store due to changes in the lab result program stage or the LIS API.
 
 ### Lab Information System
 
@@ -205,11 +208,11 @@ A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequis
 * [process-lab-request.camel.yaml](iol/src/main/resources/camel/process-lab-request.camel.yaml) - Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the message to be final stage of processing
 * [import-lab-report.camel.yaml](iol/src/main/resources/camel/import-lab-report.camel.yaml) - Imports lhe lab report into DHIS2.
 
-What follows are answers to some common questions to customisation:
+What follows is a Q&A for some common scenarios when adapting the IOL:
 
 #### My LIS conforms to a different FHIR IG or I need to fetch different FHIR resources from the LIS for the lab report. How do I configure the IOL to read and transform the right resources?
 
-Within the `fetch-diagnostic-report.camel.yaml` IOL config, change the URL path of the `simple` expression within the `setHeader` key to include or exclude the required FHIR resources from the LIS search results. The [official FHIR documentation](https://hl7.org/fhir/search.html) describes the search operations that can be expressed in the URL path. 
+Within the `fetch-diagnostic-report.camel.yaml` IOL config, change the URL path of the `simple` expression within the `setHeader` key to include or exclude the required FHIR resources from the LIS search results. The [official FHIR documentation](https://hl7.org/fhir/search.html) describes the search operations that can be expressed in the URL path.data 
 
 #### How to turn the IOL from a polling consumer into an event-driven one to improve the timeliness of lab reports in DHIS2 and eliminate the performance costs tied to polling?
 
@@ -221,13 +224,15 @@ When an event triggers execution in the IOL, you should factor the possibility t
 
 At the time of writing, most LISs do not speak FHIR and ground realities could make it impractical to hide the LIS behind a FHIR Facade. Adapting the IOL to talk with a non-FHIR LIS entails replacing the FHIR endpoints in the IOL configs while also swapping out the unmarshal processors with ones that can unmarshal the new format (e.g., HL7v2). Apache Camel has a [large catalogue of components](https://camel.apache.org/components/next/index.html) from which you can choose to integrate with different LISs. Moreover, given Camel's open architecture, you can always develop your own component when the provided ones do not meet your needs.
 
+Additionally, depending on the LIS data format, the choice of transformation engine (i.e., DataSonnet) might need to be revisited or pre-transformation steps added to prepare the data for transformation. 
+
 ## Security & Privacy Considerations
 
-The focus of this implementation is to illustrate technical interoperability. Security and privacy concerns are not addressed. It is therefore important that the integration undergoes a privacy and security review prior to adaptation.
+The focus of this implementation is to illustrate technical interoperability. Even though the integration was designed to exclude personal identifiable information from the data exchange, many other security and privacy concerns are not addressed. It is therefore important that the integration undergoes a security and privacy review prior to adaptation.
 
 ## Performance Considerations
 
-* The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. A large $n$ can lead to lab reports taking a considerable time to appear in the DHIS2 enrollment dashboard. 
+* The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. A big $n$ can lead to lab reports taking a considerable time to appear in the DHIS2 enrollment dashboard. 
   * One reason for this is because enrollments are left open instead of being marked as complete by the DHIS2 user. A simple solution could be to include a step in your standard operating procedures that instructs the DHIS2 user to complete the enrollment once the case is finished.
   * Simply having too many laboratory orders could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling).
 
