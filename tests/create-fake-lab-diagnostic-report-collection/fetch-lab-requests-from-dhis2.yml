@@ -76,12 +76,12 @@ runtime:
                .filter((attr) => attr.attribute === "tvaF9No9nkF")
                .map((attr) => attr.value);
            if (initialDiagnosis.length) {
-               var dataValue = dv.value;
+               var specimenId = dv.value;
                if (
-                   !savedSpecimenIds.includes(dataValue) &&
-                   !resultSpecimen.find((r) => r.value === dataValue)
+                   !savedSpecimenIds.includes(specimenId) &&
+                   !resultSpecimen.find((r) => r.value === specimenId)
                ) {
-                   bru.setVar("specimen_accession_identifier", dataValue);
+                   bru.setVar("specimen_accession_identifier", specimenId);
                    var response;
                    if (initialDiagnosis[0] === "EBOLA") {
                       response = await ebola();
@@ -92,8 +92,10 @@ runtime:
                    }
                    if (response.status !== 200) {
                       console.error("Diagnostic report in LIS could not be created", JSON.stringify(response));
+                   } else {
+                      console.log("Created " + initialDiagnosis[0] + " diagnostic report for specimen " + specimenId);
                    }
-                   savedSpecimenIds.push(dataValue);
+                   savedSpecimenIds.push(specimenId);
                }
            }
         }

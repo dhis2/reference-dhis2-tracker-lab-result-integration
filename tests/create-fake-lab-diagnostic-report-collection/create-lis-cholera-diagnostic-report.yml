@@ -595,11 +595,6 @@ http:
       }
   auth: inherit
 
-runtime:
-  scripts:
-    - type: after-response
-      code: console.log("Created diagnostic report for specimen " + bru.getVar("specimen_accession_identifier"))
-
 settings:
   encodeUrl: true
   timeout: 0
