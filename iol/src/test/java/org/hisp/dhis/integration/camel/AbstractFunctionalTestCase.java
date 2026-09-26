@@ -29,25 +29,13 @@
  */
 package org.hisp.dhis.integration.camel;
 
-import ca.uhn.fhir.context.FhirVersionEnum;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.camel.CamelContext;
 import org.apache.camel.test.spring.junit5.CamelSpringBootTest;
-import org.hisp.dhis.integration.sdk.Dhis2ClientBuilder;
-import org.hisp.dhis.integration.sdk.api.Dhis2Client;
 import org.junit.jupiter.api.BeforeAll;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.util.TestSocketUtils;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
@@ -62,29 +50,9 @@ import org.testcontainers.utility.DockerImageName;
 @ActiveProfiles("test")
 public class AbstractFunctionalTestCase {
 
-  @Container public static GenericContainer<?> HAPI_FHIR_CONTAINER;
-
   @Container public static GenericContainer<?> DHIS2_CONTAINER;
 
   @Container public static GenericContainer<?> DHIS2_DB_CONTAINER;
-
-  @Autowired protected CamelContext camelContext;
-
-  protected static IGenericClient fhirClient;
-
-  private static GenericContainer<?> newHapiFhirContainer() {
-    return new GenericContainer<>(DockerImageName.parse("hapiproject/hapi:v8.2.0-2-tomcat"))
-        .withEnv("SPRING_CONFIG_LOCATION", "file:///data/hapi/application.yaml")
-        .withFileSystemBind(
-            "../config/ehr/uv-lab-report-package.tgz", "/package.tgz", BindMode.READ_ONLY)
-        .withFileSystemBind(
-            "../config/ehr/hapi.application.yaml",
-            "/data/hapi/application.yaml",
-            BindMode.READ_ONLY)
-        .withExposedPorts(8080)
-        .waitingFor(
-            new HttpWaitStrategy().forStatusCode(200).withStartupTimeout(Duration.ofSeconds(160)));
-  }
 
   private static GenericContainer<?> newDhis2Container() {
     Network.NetworkImpl dhis2Network = Network.builder().build();
@@ -108,7 +76,7 @@ public class AbstractFunctionalTestCase {
     return new PostgreSQLContainer<>(
             DockerImageName.parse("postgis/postgis:12-3.2-alpine")
                 .asCompatibleSubstituteFor("postgres"))
-        .withFileSystemBind("../db-dump", "/docker-entrypoint-initdb.d/", BindMode.READ_ONLY)
+        .withFileSystemBind("../data/dhis2/db-dump", "/docker-entrypoint-initdb.d/", BindMode.READ_ONLY)
         .withExposedPorts(5432)
         .withDatabaseName(databaseName)
         .withNetworkAliases("db")
@@ -119,19 +87,14 @@ public class AbstractFunctionalTestCase {
 
   @BeforeAll
   public static void beforeAll() {
-    if (HAPI_FHIR_CONTAINER == null) {
+    if (DHIS2_CONTAINER == null) {
       DHIS2_CONTAINER = newDhis2Container();
       DHIS2_CONTAINER.start();
-      String dhis2ApiUrl =
-          String.format(
-              "http://%s:%s/api", DHIS2_CONTAINER.getHost(), DHIS2_CONTAINER.getFirstMappedPort());
-      System.setProperty("dhis2.api.url", dhis2ApiUrl);
-
-      //      HAPI_FHIR_CONTAINER = newHapiFhirContainer();
-      //      HAPI_FHIR_CONTAINER.start();
-      String fhirServerUrl = String.format("http://localhost:%s/fhir", "11111111");
-      System.setProperty("lis.api.url", fhirServerUrl);
-      fhirClient = FhirVersionEnum.R4.newContext().newRestfulGenericClient(fhirServerUrl);
     }
+    System.setProperty("lis.api.url", "http://localhost:8081/fhir");
+    String dhis2ApiUrl =
+            String.format(
+                    "http://%s:%s/api", DHIS2_CONTAINER.getHost(), DHIS2_CONTAINER.getFirstMappedPort());
+    System.setProperty("dhis2.api.url", dhis2ApiUrl);
   }
 }

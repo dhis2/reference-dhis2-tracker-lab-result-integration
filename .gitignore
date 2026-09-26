@@ -34,3 +34,6 @@ yarn-error.log*
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/data/fhirsmith/databases
+/data/fhirsmith/logs
+/data/fhirsmith/terminology-cache

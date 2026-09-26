@@ -1,0 +1,44 @@
+{
+  "server": {
+    "port": 3000,
+    "cors": {
+      "origin": true,
+      "credentials": true
+    }
+  },
+  "stats": {
+    "enabled": true,
+    "database": "stats.db",
+    "intervalMinutes": 10
+  },
+  "modules": {
+    "tx": {
+      "enabled": true,
+      "librarySource": "/app/data/tx.fhir.org.yml",
+      "publishLibrarySource": false,
+      "cacheTimeout": 30,
+      "closure": {
+        "enabled": false,
+        "database": "closure.db",
+        "requireUuidNames": false,
+        "maxTables": 1000,
+        "maxConceptsPerTable": 10000,
+        "maxConceptsPerRequest": 1000,
+        "maxEntriesPerTable": 250000,
+        "maxEntriesPerRequest": 50000,
+        "maxConfigSize": 5242880,
+        "maxQueue": 10,
+        "lockTimeout": 60
+      },
+      "expansionCacheSize": 1000,
+      "expansionCacheMemoryThreshold": 0,
+      "endpoints": [
+        {
+          "path": "/r4",
+          "fhirVersion": "4.0",
+          "context": null
+        }
+      ]
+    }
+  }
+}

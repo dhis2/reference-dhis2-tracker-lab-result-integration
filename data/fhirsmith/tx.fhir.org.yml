@@ -1,0 +1,8 @@
+base:
+  url: https://storage.googleapis.com/tx-fhir-org
+
+sources:
+  - loinc!:Loinc_2.82.db
+
+ignored:
+  - urn:iso:std:iso:3166#20210120

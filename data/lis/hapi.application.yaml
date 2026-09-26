@@ -310,7 +310,7 @@ hapi:
     remote_terminology_service:
       all:
         system: '*'
-        url: 'https://tx.fhir.org/r4/'
+        url: 'http://terminology-server:3000/r4/'
     #  snomed:
     #    system: 'http://snomed.info/sct'
     #    url: 'https://tx.fhir.org/r4/'

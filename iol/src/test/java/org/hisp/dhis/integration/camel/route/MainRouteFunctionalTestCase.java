@@ -131,7 +131,7 @@ public class MainRouteFunctionalTestCase extends AbstractFunctionalTestCase {
                 .post("dataStore/iol/diagnosticReportTransformScript")
                 .withResource(
                         IOUtils.toString(
-                                new File("../config/dhis2/diagnosticReportTransformScript.json").toURI(),
+                                new File("../data/dhis2/diagnosticReportTransformScript.json").toURI(),
                                 Charset.defaultCharset()))
                 .transfer()
                 .close();
