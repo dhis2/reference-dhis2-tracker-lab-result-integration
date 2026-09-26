@@ -104,11 +104,11 @@ Completing the lab request form does not trigger a laboratory order. It is assum
 
 After the lab request is the lab report program stage. As described in the [Interoperability Layer](#interoperability-layer) section, the IOL populates this stage with the results originating from the LIS. That is, automatically, a lab result is imported into the ongoing case when a laboratory report that has a specimen ID linking it to the lab request in DHIS2 becomes available in the LIS. The outcome is a completed lab report data entry form, like the following, for the surveillance officer to review:
 
-![Lab result form](docs/lab-result-form.png)
+![Lab report form](docs/lab-report-form.png)
 
 In this illustration, a case can have multiple lab requests and reports but a lab request can only have a single lab report. Lab report updates represent corrections or amendments to the original laboratory report. The lab result status change is reflected in the event notes section like what is presented here:
 
-![Lab result notes](docs/lab-result-notes.png)
+![Lab report notes](docs/lab-report-notes.png)
 
 ---
 
@@ -116,11 +116,11 @@ As part of the lab report integration, it is DHIS2 itself that drives the transf
 
 ![FHIR-to-DHIS2 transform script](docs/datastore-transform-script.png)
 
-In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps either the LOINC code `LA11882-0` or `LA6576-8` to the option set value `POSITIVE`. 
+In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps the LOINC code `LA6576-8` to the option set value `POSITIVE`. 
 
 ![Option set value](docs/option-set-value.png)
 
-The DHIS2 implementer benefits from having the transformation of the lab report driven by DHIS2. Such separation of logic permits the implementer to revise the LOINC-to-DHIS2 code mappings within DHIS2 without needing to enlist the technical team maintaining the IOL. Taking one step further, an implementer proficient in DataSonnet and the DHIS2 Web API could adjust the transformation script in the DHIS2 data store due to changes in the lab result program stage or the LIS API.
+The DHIS2 implementer benefits from having the transformation of the lab report driven by DHIS2. Such separation of logic permits the implementer to revise the LOINC-to-DHIS2 code mappings within DHIS2 without needing to enlist the technical team maintaining the IOL. Taking one step further, an implementer proficient in DataSonnet and the DHIS2 Web API can adjust the transformation script in the DHIS2 data store after modifications to the lab result program stage or the LIS API.
 
 ### Lab Information System
 
@@ -186,13 +186,13 @@ The IOL is configurable through one or more YAML files and/or command-line argum
 
 ## Adaptation
 
-The DHIS2-LIS reference implementation needs be adapted to fit your local needs before it can be piloted. What follows are typical places where one would want to customise in their implementation:
+The DHIS2-LIS reference implementation needs be adapted to fit your local needs before it can be piloted. What follows are typical places where one would want to customise in their integration:
 
 ### DHIS2
 
 The DHIS2 metadata needs to be localised during customisation. This includes the organisation units, data elements, option sets, attributes capturing the laboratory terminology, and the Tracker program itself. [Enrol in the DHIS2 online academies](https://academy.dhis2.org/) if you want to learn how to configure DHIS2.
 
-Notably, besides metadata, the script inside the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the differences in your Tracker programme. As a side note, changes to the transformation script would likely go hand-in-hand with changes the IOL since it is the IOL that parses the LIS laboratory report and makes the unmarshaled report visible to the transformation script.
+Notably, besides metadata, the script within the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the differences in your Tracker programme. As a side note, changes to the transformation script would likely go hand-in-hand with changes the in IOL since it is the IOL that parses the LIS laboratory report and makes the unmarshaled report visible to the transformation script.
 
 ### Interoperability Layer
 
