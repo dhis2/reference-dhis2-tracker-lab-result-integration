@@ -58,25 +58,18 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class DefaultSecurityConfig implements ApplicationListener<WebServerInitializedEvent> {
 
   @Bean
-  protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    return http.authorizeHttpRequests(
-            a ->
-                a.dispatcherTypeMatchers(DispatcherType.ASYNC)
-                    .permitAll()
-                    .requestMatchers("/login", "/logout")
-                    .permitAll()
-                    .requestMatchers("/management/**")
-                    .hasRole("ADMIN")
-                    .anyRequest()
-                    .denyAll())
+  protected SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated())
         .formLogin(withDefaults())
         .httpBasic(withDefaults())
+        // see
+        // https://docs.spring.io/spring-security/reference/6.1/servlet/exploits/csrf.html#csrf-integration-javascript-spa
         .csrf(
             csrf ->
                 csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                     .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler()))
-        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-        .build();
+        .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class);
+    return http.build();
   }
 
   @Override

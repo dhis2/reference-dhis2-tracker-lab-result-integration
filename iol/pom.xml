@@ -185,6 +185,10 @@
         </dependency>
         <dependency>
             <groupId>org.apache.camel.springboot</groupId>
+            <artifactId>camel-spring-boot-xml-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel.springboot</groupId>
             <artifactId>camel-jetty-starter</artifactId>
         </dependency>
         <dependency>
@@ -234,6 +238,16 @@
         <dependency>
             <groupId>io.hawt</groupId>
             <artifactId>hawtio-springboot4</artifactId>
+            <version>${hawtio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.hawt</groupId>
+            <artifactId>hawtio-log</artifactId>
+            <version>${hawtio.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.hawt</groupId>
+            <artifactId>hawtio-log-logback</artifactId>
             <version>${hawtio.version}</version>
         </dependency>
         <dependency>

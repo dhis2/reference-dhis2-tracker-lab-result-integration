@@ -99,6 +99,8 @@ services:
       DHIS2.API.USERNAME: admin
       DHIS2.API.PASSWORD: district
       DHIS2.API.URL: http://dhis2-reverse-proxy/api
+    ports:
+      - "9070:9070"
     depends_on:
       seed:
         condition: service_completed_successfully
