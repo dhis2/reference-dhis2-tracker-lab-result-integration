@@ -228,7 +228,7 @@ yarn simluate
 
 ## Adaptation
 
-The DHIS2-LIS reference implementation needs be adapted to fit your local needs before it can be piloted. What follows are typical places where one would want to customise in their integration:
+The DHIS2-LIS reference implementation needs be adapted to fit your local needs before it can be piloted. What follows are typical places where one would want to customise in their integration.
 
 ### DHIS2
 
