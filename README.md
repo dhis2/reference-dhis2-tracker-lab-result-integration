@@ -35,7 +35,6 @@ The expected audience of this reference implementation are enterprise and soluti
    2. [Install Yarn](https://yarnpkg.com/getting-started/install) to facilitate the building and running of the project
    3. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
    4. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a source code management tool
-   5. [Install the Bruno script runner](https://docs.usebruno.com/bru-cli/installation) to simulate the laboratory instrument that sends the diagnostic results to the LIS
 2. Within a terminal, run the command shown next to download the reference implementation repository:
     ```sh
     git clone https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration.git
@@ -64,9 +63,9 @@ The expected audience of this reference implementation are enterprise and soluti
    1. Choose a date from the _Date of data entry_ date picker
    2. Insert a random identifier like `123456` in the _Specimen ID_ field (the specimen ID must always be unique across all lab request events)
    3. Press the `Complete` button, located at bottom of the form
-8. From a terminal, change the current directory to `reference-dhis2-tracker-lab-result-integration/tests/create-fake-lab-diagnostic-report-collection` and launch `bru run fetch-lab-requests-from-dhis2.yml` to simulate the laboratory instrument. Wait until the command completes before moving on to the next step.
+8. From a terminal, run `yarn simulate` to simulate the laboratory instrument. Wait until the command completes before moving on to the next step.
 9. Wait at least a minute or two before refreshing the DHIS2 enrollment dashboard in order to give time for the LIS laboratory report to be imported into DHIS2. After the refresh, an event should appear under the _Lab report_ section of the enrollment dashboard. Try refreshing the page a couple of more times if the event does not show up.
-10. Open the lab report event to view the laboratory diagnosis confirming or refuting the initial Ebola diagnosis.
+10. Finally, open the lab report event to view the laboratory diagnosis confirming or refuting the initial Ebola diagnosis.
 
 ## Overview
 
@@ -78,7 +77,7 @@ What follows is a brief overview of the architectural components:
 
 ### DHIS2
 
-The role assigned to DHIS2 in this reference implementation is that of an integrated surveillance and outbreak response system based on the [Africa CDC Toolkit for Surveillance and Outbreak Response](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance is preconfigured with Tracker programs covering case surveillance and contact tracing. The laboratory result integration is focused on the case surveillance program which has its workflow depicted below:
+The role assigned to DHIS2 in this reference implementation is that of an integrated surveillance and outbreak response system based on the [Africa CDC Toolkit for Surveillance and Outbreak Response](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance shipped with this integration is preconfigured with Tracker programs covering case surveillance and contact tracing. The laboratory result integration is focused on the case surveillance program which has its workflow depicted below:
 
 ![Case surveillance program](docs/case-surveillance-program.png)
 
@@ -167,7 +166,19 @@ The interoperability layer (IOL) is a low-code and customisable [Apache Camel](h
       * `importStrategy` query parameter is set to `CREATE_AND_UPDATE` so that lab report event is updated should one exist.
       * `dataElementIdScheme` is set to `CODE` since the transformation result from step _6_ references the data elements by code.
 
-The IOL is configurable through one or more YAML files and/or command-line arguments. The subsequent table lists the parameters that can be configured in the IOL:
+#### Monitoring & Management
+
+The IOL exposes its metrics through JMX. A JMX client like [VisualVM](https://visualvm.github.io/) can be used to observe these metrics, however, the IOL comes bundled with [Hawtio](https://hawt.io/) so that the system operator can easily monitor and manage the application's runtime operations without prior setup.
+
+From the Hawtio web console, apart from browsing application logs, the system operator can manage Camel routes and endpoints, check the application health status, collect CPU and memory diagnostics, as well as view application settings:
+
+![Hawtio](docs/hawtio.png)
+
+You can log into the Hawtio console locally from http://localhost:9070/management/hawtio using the username `user`. The password is printed in the IOL logs when it is booting up for the very first time.
+
+#### Configuration
+
+The IOL configuration is expressed through YAML files, Java properties files, or command-line arguments. The subsequent table lists common parameters that can be configured in the IOL:
 
 |           **Parameter Name**            | **Description**                                                                           |
 |:---------------------------------------:|:------------------------------------------------------------------------------------------|
@@ -184,6 +195,28 @@ The IOL is configurable through one or more YAML files and/or command-line argum
 | dhis2.program.labReportProgramStage.id  | ID of the DHIS2 lab report program stage                                                  |
 |               lis.api.url               | URL pointing to the LIS server                                                            |
 
+## Test Kit
+
+The test kit is composed of end-to-end automated tests and an API client that simulates the laboratory instrument sending its results to the LIS. Ensure that you run `yarn install` from your terminal prior to running the end-to-end tests or simulating the laboratory instrument.
+
+### End-to-end Tests
+
+The end-to-end tests are located in the `tests` project directory. [Playwright](https://playwright.dev/) is the end-to-end test runner. Execute the following to have Playwright execute the tests:
+
+```shell
+yarn test
+```
+
+The tests depend on the services as declared in the [docker-compose.yml](docker-compose.yml) config. Playwright will automatically bring up the Docker containers if they are unavailable before running the tests.
+
+### Simulating lab instrument
+
+The scripts creating FHIR diagnostic reports in the LIS are located in the `tests/create-fake-lab-diagnostic-report-collection` project directory path. [Bruno](https://www.usebruno.com/) is the API client that runs these script. Execute the following to simulate the laboratory instrument sending diagnostic reports to the mock LIS:
+
+```shell
+yarn simluate
+```
+
 ## Adaptation
 
 The DHIS2-LIS reference implementation needs be adapted to fit your local needs before it can be piloted. What follows are typical places where one would want to customise in their integration:
@@ -196,7 +229,7 @@ Notably, besides metadata, the script within the DHIS2 data store used to transf
 
 ### Interoperability Layer
 
-A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. The behaviour of the IOL is mostly defined in the YAML configs located in the `iol/src/main/resources/camel` project path. Below is a description of each config's role:
+A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. The IOL source code is located in the `iol` directory of this project where most of its behaviour is defined in the YAML configs located in the `iol/src/main/resources/camel` project path. Below is a description of each config's role:
 
 * [main.camel.yaml](iol/src/main/resources/camel/main.camel.yaml) - Kicks off the routine scan of active enrollments
 * [fetch-diagnostic-report.camel.yaml](iol/src/main/resources/camel/fetch-diagnostic-report.camel.yaml) - Fetches the diagnostic report from the FHIR server.
@@ -221,20 +254,19 @@ When an event triggers execution in the IOL, you should factor the possibility t
 
 #### How to integrate with a non-FHIR LIS?
 
-At the time of writing, most LISs do not speak FHIR and facts on ground could make it impractical to hide the LIS behind a FHIR Facade. Adapting the IOL to talk with a non-FHIR LIS entails replacing the FHIR endpoints in the IOL configs while also swapping out the unmarshal processors with ones that can unmarshal the new format (e.g., HL7v2). Apache Camel has a [large catalogue of components](https://camel.apache.org/components/next/index.html) from which you can choose to integrate with different LISs. Moreover, given Camel's open architecture, you can always develop your own component when the provided ones do not meet your needs.
+At the time of writing, most LISs do not speak FHIR and facts on the ground could make it impractical to hide the LIS behind a FHIR Facade. Adapting the IOL to talk with a non-FHIR LIS entails replacing the FHIR endpoints in the IOL configs while also swapping out the unmarshal processors with ones that can unmarshal the new format (e.g., HL7v2). Apache Camel has a [large catalogue of components](https://camel.apache.org/components/next/index.html) from which you can choose to integrate with different LISs. Moreover, given Camel's open architecture, you can always develop your own component when the provided ones do not meet your needs.
 
 Additionally, depending on the LIS data format, the choice of transformation engine (i.e., DataSonnet) might need to be revisited or pre-transformation steps added to prepare the data for transformation. 
 
 ## Security & Privacy Considerations
 
-The focus of this implementation is to illustrate technical interoperability. Many security and privacy concerns are not addressed even though the integration was designed to exclude personal identifiable information from the data exchange. It is therefore important that the integration undergoes a security and privacy review prior to adaptation.
+This integration was designed to exclude personal identifiable information from the data exchange. Nonetheless,  the focus here is to illustrate technical interoperability. Security and privacy concerns are out of scope. It is therefore important that the architecture together with the code undergo a security and privacy review prior to adaptation.
 
 ## Performance Considerations
 
 The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. A big $n$ can lead to lab reports taking a considerable time to appear in the DHIS2 enrollment dashboard. 
 * One reason for this is because enrollments are left open instead of being marked as complete by the DHIS2 user. A simple solution could be to include a step in your standard operating procedures that instructs the DHIS2 user to complete the enrollment once the case is finished.
-* Simply having too many laboratory orders could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling).
-
+* Simply having too many laboratory orders (e.g., due to a disease outbreak) could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling).
 
 # Support
 

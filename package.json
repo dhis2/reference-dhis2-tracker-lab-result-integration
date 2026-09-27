@@ -17,6 +17,7 @@
     "build": "concurrently --kill-others-on-fail \"yarn:build-iol\"",
     "start-services": "docker compose up --wait --build --renew-anon-volumes --force-recreate --remove-orphans",
     "start": "concurrently --kill-others-on-fail \"yarn:start-services\"",
-    "test": "playwright test"
+    "test": "playwright test",
+    "simulate": "cd tests/create-fake-lab-diagnostic-report-collection; bru run fetch-lab-requests-from-dhis2.yml"
   }
 }
