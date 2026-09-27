@@ -12,11 +12,11 @@
          - [Monitoring & Management](#monitoring--management)
          - [Configuration](#configuration)
    * [Test Kit](#test-kit)
-      + [End-to-end Tests](#end-to-end-tests)
+      + [End-to-End Tests](#end-to-end-tests)
       + [Simulating lab instrument](#simulating-lab-instrument)
-   * [Adaptation](#adaptation)
-      + [DHIS2](#dhis2-1)
-      + [Interoperability Layer](#interoperability-layer-1)
+        * [Adaptation](#adaptation)
+           + [DHIS2](#dhis2-1)
+           + [Interoperability Layer](#interoperability-layer-1)
    * [Security & Privacy Considerations](#security--privacy-considerations)
    * [Performance Considerations](#performance-considerations)
 - [Support](#support)
@@ -29,9 +29,9 @@ A Laboratory Information System (LIS) is typically the primary source of laborat
 
 As defined in [Laboratory Information Systems Project Management: A Guidebook for International Implementations](https://aphl.org/docs/default-source/technical/gh-2019may-lis-guidebook-web.pdf), a LIS is a _computer-based information management systems created specifically for laboratories, to support workflow, track data from the start to the end of the testing process, store data, and provide correct and complete information to laboratory staff, managers, and customers in a timely manner allowing for decision making by clinicians, epidemiologists and other stakeholders_.
 
-This reference implementation imports the laboratory results from a LIS into a DHIS2 Tracker program used for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the structural and semantic differences between the FHIR and DHIS2 resources.
+This reference implementation demonstrates, in a sandbox environment, the import of laboratory reports from a LIS into a DHIS2 Tracker program designed for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the structural and semantic differences between the FHIR and DHIS2 resources.
 
-The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a working example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
+The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, working example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
 
 ## Quick Start
 
@@ -124,7 +124,7 @@ In terms of terminology mapping, DHIS2 binds the data elements and option set va
 
 ![Option set value](docs/option-set-value.png)
 
-The DHIS2 implementer benefits from having the terminology mapping driven by DHIS2 because it permits the implementer to revise the LOINC-to-DHIS2 code mappings without ever leaving DHIS2. Moreover, an implementer proficient in both DataSonnet and the DHIS2 Web API, can adjust the transformation script in the DHIS2 data store when the lab result program stage or the LIS API is modified. The overall implication is that the DHIS2 implementer does need to enlist the IOL technical team when the mapping or transformation rules changes.
+The DHIS2 implementer benefits from having the terminology mapping driven by DHIS2 because it permits the implementer to revise the LOINC-to-DHIS2 code mappings without ever leaving DHIS2. Moreover, an implementer proficient in both DataSonnet and the DHIS2 Web API, can adjust the transformation script in the DHIS2 data store when the lab result program stage or the LIS API is modified. The overall implication is that the DHIS2 implementer does need to enlist the IOL technical team when the mapping or transformation rules change.
 
 ### Lab Information System
 
@@ -204,7 +204,7 @@ The IOL configuration is expressed through YAML files, Java properties files, or
 
 The test kit is composed of end-to-end automated tests and scripts that simulate the laboratory instrument sending its results to the LIS. Ensure that you run `yarn install` from your terminal prior to running the end-to-end tests or simulating the laboratory instrument.
 
-### End-to-end Tests
+### End-to-End Tests
 
 The end-to-end tests are located in the `tests` project directory. [Playwright](https://playwright.dev/) is the end-to-end test runner. Execute the following to have Playwright execute the tests:
 
@@ -261,7 +261,7 @@ When an event triggers execution in the IOL, you should factor the possibility t
 
 At the time of writing, most LISs do not speak FHIR and facts on the ground could make it impractical to hide the LIS behind a FHIR Facade. Adapting the IOL to talk with a non-FHIR LIS entails replacing the FHIR endpoints in the IOL configs while also swapping out the unmarshal processors with ones that can unmarshal the new format (e.g., HL7v2). Apache Camel has a [large catalogue of components](https://camel.apache.org/components/next/index.html) from which you can choose to integrate with different LISs. Moreover, given Camel's open architecture, you can always develop your own component when the provided ones do not meet your needs.
 
-Additionally, depending on the LIS data format, the choice of transformation engine (i.e., DataSonnet) might need to be revisited or pre-transformation steps added to prepare the data for transformation. 
+Additionally, depending on the LIS data format, the choice of transformation engine (i.e., DataSonnet) might need to be revisited or pre-transformation steps added to prepare the data for transformation.
 
 ## Security & Privacy Considerations
 
