@@ -19,7 +19,7 @@
            + [Interoperability Layer](#interoperability-layer-1)
    * [Security & Privacy Considerations](#security--privacy-considerations)
    * [Performance Considerations](#performance-considerations)
-- [Support](#support)
+* [Support](#support)
 
 ## What is this implementation?
 
@@ -33,7 +33,7 @@ This reference implementation demonstrates, in a sandbox environment, the import
 
 The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the structural and semantic differences between the FHIR and DHIS2 resources:
    * the structural differences are the mismatch between the DHIS2 and FHIR JSON formats. 
-   * the semantic differences are the mismatch of terminologies where the LIS employs [LOINC](https://loinc.org/) whereas DHIS2 has its own custom codes to represent laboratory results. 
+   * the semantic differences are the mismatch of terminologies where the LIS employs [LOINC](https://loinc.org/) whereas DHIS2 has its own custom metadata codes to represent laboratory results. 
 
 The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, executable example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
 
