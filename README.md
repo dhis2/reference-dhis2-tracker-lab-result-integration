@@ -31,9 +31,9 @@ As defined in [Laboratory Information Systems Project Management: A Guidebook fo
 
 This reference implementation demonstrates, in a sandbox environment, the import of laboratory reports from a LIS into a DHIS2 Tracker program designed for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). 
 
-The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the structural and semantic differences between the FHIR and DHIS2 resources:
-   * the structural differences are the mismatch between the DHIS2 and FHIR JSON formats. 
-   * the semantic differences are the mismatch of terminologies where the LIS employs [LOINC](https://loinc.org/) whereas DHIS2 has its own custom metadata codes to represent laboratory results. 
+The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the differences between the FHIR and DHIS2 resources. These differences can be divided into:
+   * structural due to the mismatch between the DHIS2 and FHIR JSON formats. 
+   * semantic due to terminology mismatch where the LIS employs [LOINC](https://loinc.org/) whereas the DHIS2 Tracker program has its own custom metadata codes for the data elements and option set values capturing the laboratory tests and results.
 
 The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, executable example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
 
