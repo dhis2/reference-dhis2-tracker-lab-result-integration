@@ -120,21 +120,21 @@ As part of the lab report integration, it is DHIS2 itself that drives the transf
 
 ![FHIR-to-DHIS2 transform script](docs/datastore-transform-script.png)
 
-In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps the LOINC code `LA6576-8` to the option set value `POSITIVE`. 
+In terms of terminology mapping, DHIS2 binds the data elements and option set values to lab terminology via attributes. For example, the following option set value config maps the LOINC code `LA6576-8` to the option set value `POSITIVE`:
 
 ![Option set value](docs/option-set-value.png)
 
-The DHIS2 implementer benefits from having the transformation of the lab report driven by DHIS2. Such separation of logic permits the implementer to revise the LOINC-to-DHIS2 code mappings within DHIS2 without needing to enlist the technical team maintaining the IOL. Taking one step further, an implementer proficient in DataSonnet and the DHIS2 Web API can adjust the transformation script in the DHIS2 data store after modifications to the lab result program stage or the LIS API.
+The DHIS2 implementer benefits from having the terminology mapping driven by DHIS2 because it permits the implementer to revise the LOINC-to-DHIS2 code mappings without ever leaving DHIS2. Moreover, an implementer proficient in both DataSonnet and the DHIS2 Web API, can adjust the transformation script in the DHIS2 data store when the lab result program stage or the LIS API is modified. The overall implication is that the DHIS2 implementer does need to enlist the IOL technical team when the mapping or transformation rules changes.
 
 ### Lab Information System
 
 The LIS is the source of the lab reports in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, for this reference implementation, a test kit is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
 
-The mock LIS is powered by [HAPI FHIR](https://hapifhir.io/): a popular open-source server implementation of FHIR. [FHIR](https://hl7.org/fhir/overview.html) (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface.
+The mock LIS is powered by [HAPI FHIR](https://hapifhir.io/): a popular open-source server implementation of FHIR. [FHIR](https://hl7.org/fhir/overview.html) (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface. 
 
 The FHIR server is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). The guide is still in draft stage at the time of writing. Nevertheless, it was selected to represent the lab report exchange thanks to its broad scope due to the participation of experts from several countries, projects, and initiatives. 
 
-The IG profiles several FHIR resources though the following are exchanged in this integration:
+The IG profiles several FHIR resources though the following are exchanged with DHIS2 in this integration:
 
 * [Specimen](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Specimen-uv-lab.html): holds the specimen ID and the date the specimen was received at the lab
 * [Observation](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Observation-resultslab-uv-lab.html): contains the LOINC codes, or the DHIS2 codes as free-form text, identifying the test carried out and its result
@@ -202,7 +202,7 @@ The IOL configuration is expressed through YAML files, Java properties files, or
 
 ## Test Kit
 
-The test kit is composed of end-to-end automated tests and an API client that simulates the laboratory instrument sending its results to the LIS. Ensure that you run `yarn install` from your terminal prior to running the end-to-end tests or simulating the laboratory instrument.
+The test kit is composed of end-to-end automated tests and scripts that simulate the laboratory instrument sending its results to the LIS. Ensure that you run `yarn install` from your terminal prior to running the end-to-end tests or simulating the laboratory instrument.
 
 ### End-to-end Tests
 
