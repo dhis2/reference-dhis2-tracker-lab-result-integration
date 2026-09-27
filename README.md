@@ -58,7 +58,7 @@ The expected audience of this reference implementation are enterprise and soluti
      * a mock LIS which is a HAPI FHIR server reachable from `http://localhost:8081/`
      * the IOL running as a background process
 4. From your browser, type the following in the address bar to open the enrollment form for the case surveillance program: http://localhost:8080/apps/capture#/new?orgUnitId=DiszpKrYNg8&programId=N07iEegH3Hw. Alternatively, follow these steps:
-   1. Open the Capture app from the DHIS2 dashboard in your local DHIS2 instance on `http://localhost:8080/`
+   1. Open the Capture app from the DHIS2 dashboard in your local DHIS2 instance on [`http://localhost:8080/`](http://localhost:8080/)
    2. Expand the _Program_ drop-down box and pick _Case Surveillance_ 
    3. Expand the _Organisation unit_ down-down box and type _Ngelehun CHC_ before proceeding to select it
    4. Press the _Create new person_ button
@@ -82,7 +82,7 @@ What follows is a brief overview of the architectural components:
 
 ### DHIS2
 
-The role assigned to DHIS2 in this reference implementation is that of an integrated surveillance and outbreak response system based on the [Africa CDC Toolkit for Surveillance and Outbreak Response](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance shipped with this integration is preconfigured with Tracker programs covering case surveillance and contact tracing. The laboratory result integration is focused on the case surveillance program which has its workflow depicted below:
+The role assigned to DHIS2 in this reference implementation is that of an integrated surveillance and outbreak response system based on the [Africa CDC Toolkit for Surveillance and Outbreak Response](https://dhis2.org/events/africa-cdc-toolkit-ebola/). The DHIS2 instance shipped with the sandbox is preconfigured with Tracker programs covering case surveillance and contact tracing. The laboratory result integration is focused on the case surveillance program which has its workflow depicted below:
 
 ![Case surveillance program](docs/case-surveillance-program.png)
 
@@ -130,7 +130,7 @@ The DHIS2 implementer benefits from having the transformation of the lab report 
 
 The LIS is the source of the lab reports in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, for this reference implementation, a test kit is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
 
-HAPI FHIR is a popular open-source server implementation of FHIR that powers the mock LIS. [FHIR](https://hl7.org/fhir/overview.html) (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface.
+The mock LIS is powered by [HAPI FHIR](https://hapifhir.io/): a popular open-source server implementation of FHIR. [FHIR](https://hl7.org/fhir/overview.html) (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface.
 
 The FHIR server is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). The guide is still in draft stage at the time of writing. Nevertheless, it was selected to represent the lab report exchange thanks to its broad scope due to the participation of experts from several countries, projects, and initiatives. 
 
@@ -216,7 +216,7 @@ The tests depend on the services as declared in the [docker-compose.yml](docker-
 
 ### Simulating lab instrument
 
-The scripts creating FHIR diagnostic reports in the LIS are located in the `tests/create-fake-lab-diagnostic-report-collection` project directory path. [Bruno](https://www.usebruno.com/) is the API client that runs these script. Execute the following to simulate the laboratory instrument sending diagnostic reports to the mock LIS:
+The scripts creating FHIR diagnostic reports in the LIS are located in the `tests/create-fake-lab-diagnostic-report-collection` project directory path. [Bruno](https://www.usebruno.com/) is the API client that runs these scripts. Execute the following to simulate the laboratory instrument sending diagnostic reports to the mock LIS:
 
 ```shell
 yarn simluate
@@ -249,7 +249,7 @@ What follows is a Q&A for some common scenarios when adapting the IOL:
 
 #### My LIS conforms to a different FHIR IG or I need to fetch different FHIR resources from the LIS for the lab report. How do I configure the IOL to read and transform the right resources?
 
-Within the `fetch-diagnostic-report.camel.yaml` IOL config, change the URL path of the `simple` expression within the `setHeader` key to include or exclude the required FHIR resources from the LIS search results. The [official FHIR documentation](https://hl7.org/fhir/search.html) describes the search operations that can be expressed in the URL path.data 
+Within the `fetch-diagnostic-report.camel.yaml` IOL config, change the URL path of the `simple` expression within the `setHeader` key to include or exclude the required FHIR resources from the LIS search results. The [official FHIR documentation](https://hl7.org/fhir/search.html) describes the search operations that can be expressed in the URL path. 
 
 #### How to turn the IOL from a polling consumer into an event-driven one to improve the timeliness of lab reports in DHIS2 and eliminate the performance costs tied to polling?
 
@@ -271,7 +271,7 @@ This integration was designed to exclude personal identifiable information from 
 
 The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. A big $n$ can lead to lab reports taking a considerable time to appear in the DHIS2 enrollment dashboard. 
 * One reason for this is because enrollments are left open instead of being marked as complete by the DHIS2 user. A simple solution could be to include a step in your standard operating procedures that instructs the DHIS2 user to complete the enrollment once the case is finished.
-* Simply having too many laboratory orders (e.g., due to a disease outbreak) could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling).
+* Having too many laboratory orders (e.g., due to a disease outbreak) could be another reason. In such cases, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling).
 
 # Support
 
