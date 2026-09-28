@@ -32,10 +32,10 @@ As defined in [Laboratory Information Systems Project Management: A Guidebook fo
 This reference implementation demonstrates, in a sandbox environment, the import of laboratory reports from a LIS into a DHIS2 Tracker program designed for case-based disease surveillance. The import is accomplished by (1) fetching laboratory diagnostic reports from a mock LIS conforming to the [HL7 Laboratory FHIR Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/), (2) transforming the diagnostic reports into Tracker events, and then (3) transmitting the events to the [DHIS2 Web API](https://docs.dhis2.org/en/develop/using-the-api/dhis-core-version-master/introduction.html). 
 
 The data exchange between the health information systems is mediated thanks to a DHIS2-driven Interoperability Layer (IOL) component which also bridges the differences between the FHIR and DHIS2 resources. These differences can be divided into:
-   * structural due to the mismatch between the DHIS2 and FHIR JSON formats. 
+   * structural due to the mismatch between the DHIS2 and FHIR JSON formats, and
    * semantic due to the terminology mismatch where the LIS employs [LOINC](https://loinc.org/), whereas the DHIS2 Tracker program has its own custom metadata codes for the data elements and option set values capturing the laboratory tests and results.
 
-The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, working example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
+The expected audience of this reference implementation is enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, working example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
 
 ## Quick Start
 
@@ -211,7 +211,7 @@ The test kit is composed of end-to-end automated tests and scripts that simulate
 
 ### End-to-End Tests
 
-The end-to-end tests are located in the `tests` project directory. [Playwright](https://playwright.dev/) is the end-to-end test runner. Execute the following to have Playwright execute the tests:
+The end-to-end tests are located in the `tests` project directory. [Playwright](https://playwright.dev/) is the end-to-end test runner. Execute the following to have Playwright run the tests:
 
 ```shell
 yarn test
@@ -236,14 +236,14 @@ The DHIS2-LIS reference implementation needs be adapted to fit your local needs 
 The DHIS2 metadata needs to be localised during customisation. This includes the organisation units, data elements, option sets, attributes capturing the laboratory terminology, and the Tracker program itself. [Enrol in the DHIS2 online academies](https://academy.dhis2.org/) if you want to learn how to configure DHIS2.
 
 Notably, besides metadata, the script within the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the differences in your Tracker programme. As a side note, substantial changes to the transformation script would go hand-in-hand with changes to the IOL when: 
-1. the LIS data format is not FHIR over JSON, or 
-2. the laboratory reports are represented in FHIR resources that do not match the ones enumerated in the [Lab Information System](#lab-information-system) section.
+* the LIS data format is not FHIR over JSON, or 
+* the laboratory reports are represented in FHIR resources that do not match the ones enumerated in the [Lab Information Section](#lab-information-system).
 
 ### Interoperability Layer
 
 A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. Besides Camel, a rudimentary knowledge of Java, [Spring Boot](https://spring.io/projects/spring-boot), and [Maven](https://maven.apache.org/) will go a long way when modifying the project. 
 
-The IOL source code is located in the `iol` directory of this project where most of its behaviour is defined in the YAML configs located in the `iol/src/main/resources/camel` project path. Below is a description of each config's role:
+The IOL source code is located in the `iol` directory of this project where most of its behaviour is defined in the YAML configs located in the `src/main/resources/camel` directory path. Below is a description of each config's role:
 
 * [main.camel.yaml](iol/src/main/resources/camel/main.camel.yaml) - Kicks off the routine scan of active enrollments
 * [fetch-diagnostic-report.camel.yaml](iol/src/main/resources/camel/fetch-diagnostic-report.camel.yaml) - Fetches the diagnostic report from the FHIR server.
