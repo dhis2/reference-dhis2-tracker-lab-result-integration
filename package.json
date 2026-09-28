@@ -13,7 +13,7 @@
     "@usebruno/cli": "4.1.0"
   },
   "scripts": {
-    "build-iol": "mvn -B clean package -Dmaven.test.skip=true -f iol/pom.xml",
+    "build-iol": "cd iol/; node -e \"process.exit(process.platform === 'win32' ? 0 : 1)\" && mvnw.cmd -B clean package -Dmaven.test.skip=true || ./mvnw -B clean package -Dmaven.test.skip=true",
     "build": "concurrently --kill-others-on-fail \"yarn:build-iol\"",
     "start-services": "docker compose up --wait --build --renew-anon-volumes --force-recreate --remove-orphans",
     "start": "concurrently --kill-others-on-fail \"yarn:start-services\"",

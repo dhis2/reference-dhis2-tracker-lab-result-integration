@@ -19,4 +19,4 @@ jobs:
           distribution: 'temurin'
           cache: maven
       - name: Test IOL
-        run: mvn -B clean package -f iol/pom.xml
+        run: cd iol; ./mvnw -B clean package

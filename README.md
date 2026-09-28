@@ -40,7 +40,7 @@ The expected audience of this reference implementation is enterprise and solutio
 ## Quick Start
 
 1. From the machine where you intend to run the reference implementation:
-   1. [Install Maven](https://maven.apache.org/install.html) to be able to build the IOL
+   1. [Install a recent version of the Java Development Kit](https://adoptium.net/temurin/releases) to be able to build the IOL
    2. [Install Node](https://nodejs.org/en/download) so that you can run Yarn
    3. [Install Yarn](https://yarnpkg.com/getting-started/install) to facilitate the building and running of the project
    4. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
@@ -254,10 +254,16 @@ The IOL source code is located in the `iol` directory of this project where most
 * [process-lab-request.camel.yaml](iol/src/main/resources/camel/process-lab-request.camel.yaml) - Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the message to be final stage of processing
 * [import-lab-report.camel.yaml](iol/src/main/resources/camel/import-lab-report.camel.yaml) - Imports lhe lab report into DHIS2.
 
-Config or code changes to the IOL should always be followed by changes to the IOL unit tests present in the `iol/src/test` project path. The IOL is built and unit tested with the following terminal command:
+Config or code changes to the IOL should always be followed by changes to the IOL unit tests present in the `iol/src/test` project path. The IOL is built and unit tested with the following terminal command, run from within the `iol` directory:
 
 ```shell
-mvn -B clean package -f iol/pom.xml
+./mvnw clean package
+```
+
+On Windows, run instead:
+
+```shell
+mvnw.cmd clean package
 ```
 
 What follows is a Q&A for some common scenarios when adapting the IOL:
