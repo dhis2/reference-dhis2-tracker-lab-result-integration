@@ -237,7 +237,7 @@ The DHIS2 metadata needs to be localised during customisation. This includes the
 
 Notably, besides metadata, the script within the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the differences in your Tracker programme. As a side note, substantial changes to the transformation script would go hand-in-hand with changes to the IOL when: 
 1. the LIS data format is not FHIR over JSON, or 
-2. the laboratory reports are represented in FHIR resources that do not match the ones enumerated in the [Lab Information Section](#lab-information-system).
+2. the laboratory reports are represented in FHIR resources that do not match the ones enumerated in the [Lab Information System](#lab-information-system) section.
 
 ### Interoperability Layer
 
