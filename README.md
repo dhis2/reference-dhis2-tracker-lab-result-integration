@@ -40,10 +40,11 @@ The expected audience of this reference implementation are enterprise and soluti
 ## Quick Start
 
 1. From the machine where you intend to run the reference implementation:
-   1. [Install Node](https://nodejs.org/en/download) so that you can run Yarn
-   2. [Install Yarn](https://yarnpkg.com/getting-started/install) to facilitate the building and running of the project
-   3. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
-   4. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a source code management tool
+   1. [Install Maven](https://maven.apache.org/install.html) to be able to build the IOL
+   2. [Install Node](https://nodejs.org/en/download) so that you can run Yarn
+   3. [Install Yarn](https://yarnpkg.com/getting-started/install) to facilitate the building and running of the project
+   4. [Install Docker Desktop](https://docs.docker.com/desktop/) which provides the tooling required to bring up the sandbox environment
+   5. [Install the Git client](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) which is a source code management tool
 2. Within a terminal, run the command shown next to download the reference implementation repository:
     ```sh
     git clone https://github.com/dhis2/reference-dhis2-tracker-lab-result-integration.git
@@ -234,11 +235,15 @@ The DHIS2-LIS reference implementation needs be adapted to fit your local needs 
 
 The DHIS2 metadata needs to be localised during customisation. This includes the organisation units, data elements, option sets, attributes capturing the laboratory terminology, and the Tracker program itself. [Enrol in the DHIS2 online academies](https://academy.dhis2.org/) if you want to learn how to configure DHIS2.
 
-Notably, besides metadata, the script within the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the differences in your Tracker programme. As a side note, changes to the transformation script would likely go hand-in-hand with changes the in IOL since it is the IOL that parses the LIS laboratory report and makes the unmarshaled report visible to the transformation script.
+Notably, besides metadata, the script within the DHIS2 data store used to transform the lab reports within the IOL would likely need to be altered. The nature of the changes largely depend on (1) how the LIS communicates the laboratory reports to the IOL (e.g., the FHIR resources making up the laboratory report could be structured differently or the LIS does not conform to FHIR) and (2) the differences in your Tracker programme. As a side note, substantial changes to the transformation script would go hand-in-hand with changes to the IOL when: 
+1. the LIS data format is not FHIR over JSON, or 
+2. the laboratory reports are represented in FHIR resources that do not match the ones enumerated in the [Lab Information Section](#lab-information-system).
 
 ### Interoperability Layer
 
-A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. The IOL source code is located in the `iol` directory of this project where most of its behaviour is defined in the YAML configs located in the `iol/src/main/resources/camel` project path. Below is a description of each config's role:
+A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. Besides Camel, a rudimentary knowledge of Java, [Spring Boot](https://spring.io/projects/spring-boot), and [Maven](https://maven.apache.org/) will go a long way when modifying the project. 
+
+The IOL source code is located in the `iol` directory of this project where most of its behaviour is defined in the YAML configs located in the `iol/src/main/resources/camel` project path. Below is a description of each config's role:
 
 * [main.camel.yaml](iol/src/main/resources/camel/main.camel.yaml) - Kicks off the routine scan of active enrollments
 * [fetch-diagnostic-report.camel.yaml](iol/src/main/resources/camel/fetch-diagnostic-report.camel.yaml) - Fetches the diagnostic report from the FHIR server.
@@ -248,6 +253,12 @@ A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequis
 * [process-enrollment.camel.yaml](iol/src/main/resources/camel/process-enrollment.camel.yaml) - Pulls out completed lab request events from the enrollment before sending the events downstream for further processing.
 * [process-lab-request.camel.yaml](iol/src/main/resources/camel/process-lab-request.camel.yaml) - Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the message to be final stage of processing
 * [import-lab-report.camel.yaml](iol/src/main/resources/camel/import-lab-report.camel.yaml) - Imports lhe lab report into DHIS2.
+
+Config or code changes to the IOL should always be followed by changes to the IOL unit tests present in the `iol/src/test` project path. The IOL is built and unit tested with the following terminal command:
+
+```shell
+mvn -B clean package -f iol/pom.xml
+```
 
 What follows is a Q&A for some common scenarios when adapting the IOL:
 
@@ -273,7 +284,7 @@ This integration was designed to exclude personal identifiable information from 
 
 ## Performance Considerations
 
-The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. A big $n$ can lead to lab reports taking a considerable time to appear in the DHIS2 enrollment dashboard. There can be various reasons for this, including: 
+The time it takes for the IOL to complete a run is $O(n)$, where $n$ is the number of completed lab requests in active enrollments. A big $n$ can lead to lab reports taking a considerable time to appear in the DHIS2 enrollment dashboard. There can be various reasons for this, among them: 
 * Case surveillance enrollments in DHIS2 are left open instead of being marked as complete by the DHIS2 user. A simple solution could be to include a step in your standard operating procedures that instructs the DHIS2 user to complete the enrollment once the case is finished.
 * Having too many laboratory orders (e.g., due to a disease outbreak). In such cases, if it is not viable to allocate more resources (e.g., memory) to your applications, one ought to consider re-implementing the IOL as an [event-driven consumer](#how-to-turn-the-iol-from-a-polling-consumer-into-an-event-driven-one-to-improve-the-timeliness-of-lab-reports-in-dhis2-and-eliminate-the-performance-costs-tied-to-polling).
 
