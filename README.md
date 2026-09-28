@@ -35,7 +35,7 @@ The data exchange between the health information systems is mediated thanks to a
    * structural due to the mismatch between the DHIS2 and FHIR JSON formats. 
    * semantic due to the terminology mismatch where the LIS employs [LOINC](https://loinc.org/), whereas the DHIS2 Tracker program has its own custom metadata codes for the data elements and option set values capturing the laboratory tests and results.
 
-The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, executable example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
+The expected audience of this reference implementation are enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, working example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
 
 ## Quick Start
 
