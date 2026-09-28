@@ -269,7 +269,7 @@ Additionally, depending on the LIS data format, the choice of transformation eng
 
 ## Security & Privacy Considerations
 
-This integration was designed to exclude personal identifiable information from the data exchange. Nonetheless,  the focus here is to illustrate technical interoperability. Security and privacy concerns are out of scope. It is therefore important that the architecture together with the code undergo a security and privacy review prior to adaptation.
+This integration was designed to exclude personal identifiable information from the data exchange. Nonetheless,  the focus here is to illustrate technical interoperability. Security and privacy concerns are out of scope. It is therefore important that the architecture together with the design and code undergo a security and privacy review prior to adaptation.
 
 ## Performance Considerations
 
