@@ -224,12 +224,12 @@ The tests depend on the services as declared in the [docker-compose.yml](docker-
 The scripts creating FHIR diagnostic reports in the LIS are located in the `tests/create-fake-lab-diagnostic-report-collection` project directory path. [Bruno](https://www.usebruno.com/) is the API client that runs these scripts. Execute the following to simulate the laboratory instrument sending diagnostic reports to the mock LIS:
 
 ```shell
-yarn simluate
+yarn simulate
 ```
 
 ## Adaptation
 
-The DHIS2-LIS reference implementation needs be adapted to fit your local needs before it can be piloted. What follows are typical places where one would want to customise in their integration.
+The DHIS2-LIS reference implementation needs to be adapted to fit your local needs before it can be piloted. What follows are typical places where one would want to customise in their integration.
 
 ### DHIS2
 
@@ -241,7 +241,7 @@ Notably, besides metadata, the script within the DHIS2 data store used to transf
 
 ### Interoperability Layer
 
-A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. Besides Camel, a rudimentary knowledge of Java, [Spring Boot](https://spring.io/projects/spring-boot), and [Maven](https://maven.apache.org/) will go a long way when modifying the project. 
+A good understanding of [Apache Camel](https://camel.apache.org/) is a prerequisite to customising the IOL. The [DHIS2 developer documentation](https://developers.dhis2.org/docs/integration/apache-camel) provides a gentle introduction to Apache Camel. Besides Camel, a rudimentary knowledge of Java, [Spring Boot](https://spring.io/projects/spring-boot), and [Maven](https://maven.apache.org/) will go a long way in helping you to tailor the project to your requirements. 
 
 The IOL source code is located in the `iol` directory of this project where most of its behaviour is defined in the YAML configs located in the `src/main/resources/camel` directory path. Below is a description of each config's role:
 
