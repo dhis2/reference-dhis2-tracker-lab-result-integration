@@ -13,7 +13,7 @@
       - [Configuration](#configuration)
 * [Test Kit](#test-kit)
    + [End-to-End Tests](#end-to-end-tests)
-   + [Simulating lab instrument](#simulating-lab-instrument)
+   + [Lab Instrument Simulator](#lab-instrument-simulator)
 * [Adaptation](#adaptation)
    + [DHIS2](#dhis2-1)
    + [Interoperability Layer](#interoperability-layer-1)
@@ -59,11 +59,11 @@ The expected audience of this reference implementation is enterprise and solutio
    * Install the test development dependencies
    * Build the IOL application
    * Stand-up the components which include: 
-     * a DHIS2 instance reachable from `http://localhost:8080/`
-     * a mock LIS which is a HAPI FHIR server reachable from `http://localhost:8081/`
+     * a DHIS2 instance reachable from [http://localhost:8080/](http://localhost:8080/)
+     * a mock LIS which is a HAPI FHIR server reachable from [http://localhost:8081/](http://localhost:8080/)
      * the IOL running as a background process
 4. From your browser, type the following in the address bar to open the enrollment form for the case surveillance program: http://localhost:8080/apps/capture#/new?orgUnitId=DiszpKrYNg8&programId=N07iEegH3Hw. Alternatively, follow these steps:
-   1. Open the Capture app from the DHIS2 dashboard in your local DHIS2 instance on [`http://localhost:8080/`](http://localhost:8080/)
+   1. Open the Capture app from the DHIS2 dashboard in your local DHIS2 instance on [http://localhost:8080/](http://localhost:8080/)
    2. Expand the _Program_ drop-down box and pick _Case Surveillance_ 
    3. Expand the _Organisation unit_ down-down box and type _Ngelehun CHC_ before proceeding to select it
    4. Press the _Create new person_ button
@@ -107,7 +107,7 @@ The lab request stage is used to report the laboratory order and link the LIS la
 
 The mandatory specimen ID field shown is expected to be unique for each lab request, even across cases. In other workflows, instead of the specimen ID, alternative or additional unique linking identifiers could be required such as the patient name or the case ID, each with their own tradeoffs.
 
-Completing the lab request form does not trigger a laboratory order. It is assumed that the laboratory test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a test kit that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding laboratory reports, and transmits the reports to the mock LIS.
+Completing the lab request form does not trigger a laboratory order. It is assumed that the laboratory test itself is ordered at a prior point in the overall disease surveillance workflow (e.g., during initial clinical diagnosis). However, to facilitate testing and demoing, accompanying the reference implementation is a [lab instrument simulator](#lab-instrument-simulator) that fetches the completed lab requests of in-progress cases from DHIS2, generates corresponding laboratory reports, and transmits the reports to the mock LIS.
 
 #### Lab Report Stage
 
@@ -133,7 +133,7 @@ The DHIS2 implementer benefits from having the terminology mapping driven by DHI
 
 ### Lab Information System
 
-The LIS is the source of the lab reports in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, for this reference implementation, a test kit is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
+The LIS is the source of the lab reports in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, for this reference implementation, a [simulator](#lab-instrument-simulator) is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
 
 The mock LIS is powered by [HAPI FHIR](https://hapifhir.io/): a popular open-source server implementation of FHIR. [FHIR](https://hl7.org/fhir/overview.html) (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface. 
 
@@ -161,9 +161,9 @@ The interoperability layer (IOL) is a low-code and customisable [Apache Camel](h
 
    2. Search for events within the fetched active cases such that the event program stage ID is equal to `N07iEegH3Hw` (i.e., the lab request program stage) and the status is equal to `COMPLETED`. 
 
-   3. For each lab request, extract its specimen ID and attempt to retrieve the corresponding lab report within the enrollment matching the specimen ID. If the corresponding lab report within the case is retrieved, then this means that a diagnostic report for the lab request already exists in the LIS .
+   3. For each lab request, extract its specimen ID and attempt to retrieve the corresponding lab report within the enrollment matching the specimen ID. If the corresponding lab report within the case is retrieved, then this means that a diagnostic report for the lab request already exists in the LIS.
 
-   4. Record the `updatedAt` timestamp of the DHIS2 lab report should one exist. This timestamp keeps the IOL from fetching the LIS diagnostic report if it was not updated after `updatedAt` timestamp.
+   4. Record the `updatedAt` timestamp of the DHIS2 lab report should one exist. In the next step, the IOL uses this timestamp to check whether the corresponding LIS diagnostic report was updated since the last time it was processed.
 
    5. Search for _final_, _amended_, _appended_, or _corrected_ diagnostic reports by the lab request specimen ID in the LIS. A key constraint in the reference implementation is that the specimen ID is unique across laboratory orders so the IOL assumes that the LIS returns at most a single diagnostic report for a given specimen ID. The IOL behaviour is undefined when multiple diagnostic reports are in the search results. The GET HTTP call to search the reports is  `.../fhir/DiagnosticReport?status=final,amended,appended,corrected&specimen.accession=[specimenId]&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen&_lastUpdated=gt[labReportUpdatedAt]` where:
       * `[specimenId]` is substituted with the lab request specimen ID, and 
@@ -219,7 +219,7 @@ yarn test
 
 The tests depend on the services as declared in the [docker-compose.yml](docker-compose.yml) config. Playwright will automatically bring up the Docker containers if they are unavailable before running the tests.
 
-### Simulating lab instrument
+### Lab Instrument Simulator
 
 The scripts creating FHIR diagnostic reports in the LIS are located in the `tests/create-fake-lab-diagnostic-report-collection` project directory path. [Bruno](https://www.usebruno.com/) is the API client that runs these scripts. Execute the following to simulate the laboratory instrument sending diagnostic reports to the mock LIS:
 
@@ -274,7 +274,7 @@ Within the `fetch-diagnostic-report.camel.yaml` IOL config, change the URL path 
 
 #### How to turn the IOL from a polling consumer into an event-driven one to improve the timeliness of lab reports in DHIS2 and eliminate the performance costs tied to polling?
 
-Change the `from` endpoint in the `main.camel.yaml` config such that it listens for events from DHIS2 using an event-driven mechanism like [PostgreSQL Logical Replication](https://www.postgresql.org/docs/current/logical-replication.html). To simplify customisation, configure the [Camel Debezium PostgreSQL component](https://camel.apache.org/components/next/debezium-postgres-component.html) to listen for database events which uses PostgreSQL Logical Replication under the hood.
+Change the `from` endpoint in the `main.camel.yaml` config such that it listens for events from DHIS2. With the [Camel Debezium PostgreSQL component](https://camel.apache.org/components/next/debezium-postgres-component.html), you can listen to database events thanks to [PostgreSQL Logical Replication](https://www.postgresql.org/docs/current/logical-replication.html).
 
 When an event triggers execution in the IOL, you should factor the possibility that the diagnostic report is not yet available or the LIS is offline. Having the IOL retry every so often to fetch the diagnostic report in the event thread is not a good strategy in terms of resource allocation since it can lead to resource starvation. Instead, consider persisting or caching the lab request in the IOL and routinely dispatching a thread from a  pool of threads to process the locally stored lab requests. The tradeoff being made here is building more complexity into the IOL in favour of efficiency.
 
