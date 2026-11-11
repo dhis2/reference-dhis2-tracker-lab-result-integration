@@ -17,6 +17,7 @@
 * [Adaptation](#adaptation)
    + [DHIS2](#dhis2-1)
    + [Interoperability Layer](#interoperability-layer-1)
+   + [Lab Information System](#lab-information-system)
 * [Security & Privacy Considerations](#security--privacy-considerations)
 * [Performance Considerations](#performance-considerations)
 * [Support](#support)
@@ -35,7 +36,7 @@ The data exchange between the health information systems is mediated thanks to a
    * structural due to the mismatch between the DHIS2 and FHIR JSON formats, and
    * semantic due to the terminology mismatch where the LIS employs [LOINC](https://loinc.org/), whereas the DHIS2 Tracker program has its own custom metadata codes for the data elements and option set values capturing the laboratory tests and results.
 
-The expected audience of this reference implementation is enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, working example meant to technically guide you in developing your own integration between an LIS and DHIS2.  It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
+The expected audience of this reference implementation is enterprise and solution architects, integrators, and implementation engineers. This is a self-contained, working example meant to technically guide you in developing your own integration between an LIS and DHIS2. It **SHOULD NOT** be used directly in production without adapting it to your local context. Prior to studying the software artefact, it is important to read the [implementation guidance on lab interoperability](https://docs.dhis2.org/en/implement/integration-reference-implementations/laboratory-interoperability.html).
 
 ## Quick Start
 
@@ -284,9 +285,17 @@ At the time of writing, most LISs do not speak FHIR and facts on the ground coul
 
 Additionally, depending on the LIS data format, the choice of transformation engine (i.e., DataSonnet) might need to be revisited or pre-transformation steps added to prepare the data for transformation.
 
+### Laboratory Information System
+
+The FHIR server playing the role of an LIS in this illustration is missing many of the characteristics that would make it an actual LIS. When localising this reference implementation, the FHIR server needs to be substituted with the LIS in your eHealth architecture. Assuming your LIS is FHIR interoperable, you could also adapt the reference architecture so that the FHIR server sits in front of the LIS. This turns the FHIR server into a FHIR Facade for your LIS.
+
+If the laboratory reports are exchanged over FHIR, the reference's [universal Laboratory Report FHIR IG](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/) governing the exchange should be extended or replaced to fit your local needs. For instance, you might want to narrow the laboratory terminology that can be sent over FHIR. Currently, the IG allows any terminology to be used, even free-form text.
+
+Apart from FHIR interoperability, your LIS data model might not align with the Tracker programme metadata in DHIS2, even if the same terminology is used across the health information systems. For example, the LIS could be capturing individual laboratory test results whereas the Tracker programme captures related laboratory test results within a laboratory report programme stage. The data model mismatch arises from the fact that the LIS does not have a laboratory report concept that can be mapped into the laboratory report programme stage. Depending on the sociotechnical challenges, it might be easier to change the Tracker programme to fit the LIS data model rather than the other way round. Another solution could be to leave the LIS data model and Tracker programme as they are, and try to bridge the data models within the IOL. In some cases, however, this could be a bigger challenge than simply changing either one of the data models.
+
 ## Security & Privacy Considerations
 
-This integration was designed to exclude personal identifiable information from the data exchange. Nonetheless,  the focus here is to illustrate technical interoperability. Security and privacy concerns are out of scope. It is therefore important that the architecture together with the design and code undergo a security and privacy review prior to adaptation.
+This integration was designed to exclude personal identifiable information from the data exchange. Nonetheless,  the focus here is to illustrate technical interoperability. Security and privacy concerns are out of scope. It is therefore important that the architecture together with the design and code undergo security and privacy reviews prior to adaptation.
 
 ## Performance Considerations
 
