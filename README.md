@@ -17,7 +17,7 @@
 * [Adaptation](#adaptation)
    + [DHIS2](#dhis2-1)
    + [Interoperability Layer](#interoperability-layer-1)
-   + [Lab Information System](#lab-information-system)
+   + [Lab Information System](#lab-information-system-1)
 * [Security & Privacy Considerations](#security--privacy-considerations)
 * [Performance Considerations](#performance-considerations)
 * [Support](#support)
@@ -285,7 +285,7 @@ At the time of writing, most LISs do not speak FHIR and facts on the ground coul
 
 Additionally, depending on the LIS data format, the choice of transformation engine (i.e., DataSonnet) might need to be revisited or pre-transformation steps added to prepare the data for transformation.
 
-### Laboratory Information System
+### Lab Information System
 
 The FHIR server playing the role of an LIS in this illustration is missing many of the characteristics that would make it an actual LIS. When localising this reference implementation, the FHIR server needs to be substituted with the LIS in your eHealth architecture. Assuming your LIS is FHIR interoperable, you could also adapt the reference architecture so that the FHIR server sits in front of the LIS. This turns the FHIR server into a FHIR Facade for your LIS.
 
