@@ -287,7 +287,7 @@ Additionally, depending on the LIS data format, the choice of transformation eng
 
 ### Lab Information System
 
-The FHIR server playing the role of an LIS in this illustration is missing many of the characteristics that would make it an actual LIS. When localising this reference implementation, the FHIR server needs to be substituted with the LIS in your eHealth architecture. Assuming your LIS can interoperate with FHIR, you could also adapt the reference architecture so that the FHIR server sits in front of the LIS. This turns the FHIR server into a FHIR Facade for the LIS.
+The FHIR server playing the role of an LIS in this illustration is missing many of the characteristics that would make it an actual LIS. When localising this reference implementation, the FHIR server needs to be substituted with the LIS in your eHealth architecture. Assuming your LIS can interoperate with FHIR, you could also adapt the reference architecture so that the FHIR server sits in front of the LIS. This turns the server into a FHIR Facade for the LIS.
 
 If the laboratory reports are exchanged over FHIR, the reference's [universal Laboratory Report FHIR IG](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/) governing the exchange should be extended or replaced to fit your local needs. For instance, you might want to narrow the laboratory terminology that can be sent over FHIR. Currently, the IG allows any terminology to be used, even free-form text.
 
