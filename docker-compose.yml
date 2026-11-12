@@ -81,7 +81,7 @@ services:
       test: [ "CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/8080" ]
       start_period: 120s
       interval: 5s
-      timeout: 1s
+      timeout: 5s
       retries: 5
     depends_on:
       terminology-server:
