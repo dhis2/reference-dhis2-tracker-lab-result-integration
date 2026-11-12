@@ -59,6 +59,10 @@ services:
     image: ghcr.io/healthintersections/fhirsmith
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/r4/metadata"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
     security_opt:
       - no-new-privileges:true
     environment:
@@ -81,7 +85,7 @@ services:
       test: [ "CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/8080" ]
       start_period: 120s
       interval: 5s
-      timeout: 5s
+      timeout: 1s
       retries: 5
     depends_on:
       terminology-server:
