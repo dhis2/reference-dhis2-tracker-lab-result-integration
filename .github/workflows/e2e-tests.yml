@@ -23,7 +23,7 @@ jobs:
         run: yarn install --frozen-lockfile
       - name: Build
         run: yarn build
-      - run: docker compose up --build -d
+      - run: docker compose up --build --wait
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
       - name: Run Playwright tests
