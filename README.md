@@ -134,15 +134,15 @@ The DHIS2 implementer benefits from having the terminology mapping driven by DHI
 
 ### Lab Information System
 
-The LIS is the source of the lab reports in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, for this reference implementation, a [simulator](#lab-instrument-simulator) is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
+The LIS is the source of the laboratory reports in the DHIS2 case surveillance program. In the real world, one or more laboratory instruments would run tests on the specimen and then report their results to the LIS for storage and analysis. However, for this reference implementation, a [simulator](#lab-instrument-simulator) is used instead to fake the results and transmit them to a mock LIS. These results are in turn read by the IOL as described in the next section.
 
 The mock LIS is powered by [HAPI FHIR](https://hapifhir.io/): a popular open-source server implementation of FHIR. [FHIR](https://hl7.org/fhir/overview.html) (Fast Healthcare Interoperability Resources) is a modern, adaptable health data exchange standard that allows us to keep the integration decoupled from any particular LIS interface. 
 
-The FHIR server is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). The guide is still in draft stage at the time of writing. Nevertheless, it was selected to represent the lab report exchange thanks to its broad scope due to the participation of experts from several countries, projects, and initiatives. 
+The FHIR server is configured to conform to the [universal Laboratory Report Implementation Guide](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/). The guide is still in draft stage at the time of writing. Nevertheless, it was selected to represent the laboratory report exchange thanks to its broad scope due to the participation of experts from several countries, projects, and initiatives. 
 
 The IG profiles several FHIR resources though the following are exchanged with DHIS2 in this integration:
 
-* [Specimen](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Specimen-uv-lab.html): holds the specimen ID and the date the specimen was received at the lab
+* [Specimen](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Specimen-uv-lab.html): holds the specimen ID and the date the specimen was received at the laboratory
 * [Observation](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Observation-resultslab-uv-lab.html): contains the LOINC codes or free-form text, when LOINC codes are unavailable, identifying the test carried out and its result
 * [Patient](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-Patient-uv-lab.html): the test subject which can be anonymous, safeguarding patient data
 * [DiagnosticReport](https://build.fhir.org/ig/HL7/uv-lab-rep-ig/StructureDefinition-DiagnosticReport-uv-lab.html): bundles together the specimen, observation, and patient resources 
@@ -253,7 +253,7 @@ The IOL source code is located in the `iol` directory of this project where most
 * [get-transform-script.camel.yaml](iol/src/main/resources/camel/get-transform-script.camel.yaml) - Fetches the DataSonnet transformation script from the DHIS2 data store that transforms the FHIR resources to DHIS2 resources.
 * [process-enrollment.camel.yaml](iol/src/main/resources/camel/process-enrollment.camel.yaml) - Pulls out completed lab request events from the enrollment before sending the events downstream for further processing.
 * [process-lab-request.camel.yaml](iol/src/main/resources/camel/process-lab-request.camel.yaml) - Searches for a corresponding lab report DHIS2 event and any matching diagnostic result in the LIS prior to sending the message to be final stage of processing
-* [import-lab-report.camel.yaml](iol/src/main/resources/camel/import-lab-report.camel.yaml) - Imports lhe lab report into DHIS2.
+* [import-lab-report.camel.yaml](iol/src/main/resources/camel/import-lab-report.camel.yaml) - Imports the lab report into DHIS2.
 
 Config or code changes to the IOL should always be followed by changes to the IOL unit tests present in the `iol/src/test` project path. The IOL is built and unit tested with the following terminal command, run from within the `iol` directory:
 
