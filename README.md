@@ -96,7 +96,7 @@ The following sections drill down into the stages that are relevant to the lab r
 
 #### Enrollment Stage
 
-A disease surveillance case in DHIS2 starts with enrolment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enrol the person into the program. In the enrolment form shown below, the initial diagnosis can be either cholera, Ebola, or mpox.
+A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enrol the person into the program. In the enrollment form shown below, the initial diagnosis can be either cholera, Ebola, or mpox.
 
 ![Enrollment form](docs/enrollment-form.png)
 
