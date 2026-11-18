@@ -66,7 +66,7 @@ The expected audience of this reference implementation is enterprise and solutio
 4. From your browser, type the following in the address bar to open the enrollment form for the case surveillance program: http://localhost:8080/apps/capture#/new?orgUnitId=DiszpKrYNg8&programId=N07iEegH3Hw. Alternatively, follow these steps:
    1. Open the Capture app from the DHIS2 dashboard in your local DHIS2 instance on [http://localhost:8080/](http://localhost:8080/)
    2. Expand the _Program_ drop-down box and pick _Case Surveillance_ 
-   3. Expand the _Organisation unit_ down-down box and type _Ngelehun CHC_ before proceeding to select it
+   3. Expand the _Organisation unit_ down-down box, type _Ngelehun CHC_, and select the facility
    4. Press the _Create new person_ button
 5. In the enrollment form, expand the _Initial Diagnosis_ drop-down box and pick `Ebola`
 6. Press the _Save person_ button, located at the bottom of the form
@@ -96,7 +96,7 @@ The following sections drill down into the stages that are relevant to the lab r
 
 #### Enrollment Stage
 
-A disease surveillance case in DHIS2 starts with enrolment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enrol the person into the program. In the enrolment form shown below, the initial diagnosis can be either cholera, Ebola, or mpox.
+A disease surveillance case in DHIS2 starts with enrollment of a person having a suspect disease. The surveillance officer needs to select the initial diagnosis before they can enrol the person into the program. In the enrollment form shown below, the initial diagnosis can be either cholera, Ebola, or mpox.
 
 ![Enrollment form](docs/enrollment-form.png)
 
